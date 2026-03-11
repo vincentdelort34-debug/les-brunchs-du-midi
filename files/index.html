@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <!-- ═══ BASE ═══════════════════════════════════════════════════════════════ -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Canal Livraisons – Packs à quai</title>
+  <meta name="description" content="Apéros, petits-déjeuners et essentiels livrés directement à quai sur le Canal du Midi. Commande WhatsApp." />
+  <meta name="author" content="Canal Livraisons" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#2a2318" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#2a2318" media="(prefers-color-scheme: dark)" />
+
+  <!-- ═══ PWA MANIFEST ═══════════════════════════════════════════════════════ -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- ═══ iOS / SAFARI (Apple) ══════════════════════════════════════════════ -->
+  <!-- Indique à Safari que c'est une PWA installable -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Style de la barre de statut iOS -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- Nom affiché sous l'icône iOS -->
+  <meta name="apple-mobile-web-app-title" content="Canal Livraisons" />
+  <!-- Splash screen couleur de fond -->
+  <meta name="apple-touch-fullscreen" content="yes" />
+
+  <!-- Icônes Apple Touch (OBLIGATOIRES pour iOS – pas lues depuis manifest.json) -->
+  <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="72x72"   href="/icons/icon-72x72.png" />
+  <link rel="apple-touch-icon" sizes="96x96"   href="/icons/icon-96x96.png" />
+  <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+
+  <!-- Splash screens iOS (optionnel mais recommandé pour une expérience native) -->
+  <!-- iPhone 14 Pro Max -->
+  <link rel="apple-touch-startup-image"
+        media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+        href="/splashscreens/splash-1290x2796.png" />
+  <!-- iPhone 14 / 13 -->
+  <link rel="apple-touch-startup-image"
+        media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+        href="/splashscreens/splash-1170x2532.png" />
+  <!-- iPhone SE -->
+  <link rel="apple-touch-startup-image"
+        media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+        href="/splashscreens/splash-750x1334.png" />
+  <!-- iPad Pro 12.9" -->
+  <link rel="apple-touch-startup-image"
+        media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+        href="/splashscreens/splash-2048x2732.png" />
+
+  <!-- ═══ ANDROID / CHROME ═══════════════════════════════════════════════════ -->
+  <!-- Chrome lit le manifest.json, ces balises renforcent la détection -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Canal Livraisons" />
+
+  <!-- ═══ OPEN GRAPH (partage réseaux sociaux) ══════════════════════════════ -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Canal Livraisons – Packs à quai" />
+  <meta property="og:description" content="Apéros et petits-déjeuners livrés directement sur votre ponton. Canal du Midi, Le Somail → Béziers." />
+  <meta property="og:image" content="/icons/icon-512x512.png" />
+  <meta property="og:url" content="https://votre-domaine.fr" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- ═══ FAVICONS STANDARD ══════════════════════════════════════════════════ -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png" />
+
+  <!-- ═══ FONTS ═══════════════════════════════════════════════════════════════ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Évite le flash de fond blanc au lancement PWA */
+    html, body, #root { min-height: 100vh; background: #faf7f2; }
+    /* Zone safe area iPhone (notch, home indicator) */
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- ═══ VITE / CRA ENTRY ════════════════════════════════════════════════════ -->
+  <!-- Si vous utilisez Vite : -->
+  <script type="module" src="/src/main.jsx"></script>
+  <!-- Si vous utilisez Create React App, supprimez la ligne ci-dessus,
+       CRA injecte automatiquement les scripts au build. -->
+
+  <!-- ═══ ENREGISTREMENT DU SERVICE WORKER ══════════════════════════════════ -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log("[PWA] Service Worker enregistré :", registration.scope);
+
+            // Détection de mise à jour disponible
+            registration.addEventListener("updatefound", () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                  // Nouvelle version disponible → notifier l'utilisateur
+                  if (confirm("🔄 Une mise à jour est disponible. Recharger l'application ?")) {
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("[PWA] Échec enregistrement SW :", error);
+          });
+      });
+    }
+
+    // ─── Prompt d'installation (Android Chrome) ─────────────────────────────
+    let deferredPrompt;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Déclencher un bouton "Installer l'app" dans votre UI si souhaité
+      window.dispatchEvent(new CustomEvent("pwa-installable", { detail: e }));
+    });
+
+    window.addEventListener("appinstalled", () => {
+      console.log("[PWA] Application installée avec succès !");
+      deferredPrompt = null;
+    });
+
+    // Fonction globale appelable depuis React pour déclencher l'installation
+    window.triggerPWAInstall = async () => {
+      if (!deferredPrompt) return false;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      return outcome === "accepted";
+    };
+  </script>
+</body>
+</html>

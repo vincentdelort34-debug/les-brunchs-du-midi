@@ -416,36 +416,10 @@ function Catalogue() {
   const canOrder=total>=29&&formOk;
 
   // Envoie la commande à Google Sheets + retourne le lien WhatsApp
-  const sendOrder = async () => {
+  const sendOrder = () => {
     const id = `LD${new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"}).replace("/","")}-${Math.floor(Math.random()*900+100)}`;
-    const payload = {
-      id,
-      client: form.name,
-      phone:  form.phone,
-      halte:  form.halte,
-      creneau:form.creneau,
-      notes:  form.notes,
-      packs:  selPacks.map(p=>({label:p.label, price:p.price, id:p.id})),
-      extras: selExtras.map(e=>({label:e.label, price:e.price})),
-      total,
-    };
-
-    // Envoyer à Google Sheets si URL configurée
-    if (GOOGLE_SCRIPT_URL) {
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify(payload),
-        });
-        showToast(`✅ Commande ${id} enregistrée`, "green");
-      } catch(err) {
-        console.warn("Google Sheets:", err);
-      }
-    }
-
-    // Ouvrir WhatsApp
+    
+    // Construire le message WhatsApp
     const txt=[
       `🛶 *Commande Lock & Dock Delivery*`,`Réf. ${id}`,``,
       `👤 *Client :* ${form.name}`,`📞 *Tél :* ${form.phone}`,
@@ -454,7 +428,26 @@ function Catalogue() {
       ...(selExtras.length?[``,`➕ *Extras :*`,...selExtras.map(e=>`  • ${e.label} — ${e.price} €`)]:[]),
       ``,`💰 *Total : ${total} €*`,...(form.notes?[``,`📝 ${form.notes}`]:[]),
     ].join("\n");
+    
+    // Ouvrir WhatsApp IMMÉDIATEMENT (doit être dans le même clic)
     window.open(`${WA}?text=${encodeURIComponent(txt)}`, "_blank");
+
+    // Envoyer à Google Sheets en arrière-plan
+    if (GOOGLE_SCRIPT_URL) {
+      const payload = {
+        id, client:form.name, phone:form.phone, halte:form.halte,
+        creneau:form.creneau, notes:form.notes,
+        packs:selPacks.map(p=>({label:p.label,price:p.price,id:p.id})),
+        extras:selExtras.map(e=>({label:e.label,price:e.price})),
+        total,
+      };
+      fetch(GOOGLE_SCRIPT_URL, {
+        method:"POST", mode:"no-cors",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload),
+      }).then(()=>showToast(`✅ Commande ${id} enregistrée`,"green"))
+        .catch(err=>console.warn("Google Sheets:",err));
+    }
   };
 
   return (<>

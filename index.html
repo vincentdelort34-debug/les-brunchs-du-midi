@@ -269,7 +269,7 @@ const SK_ORDERS = "canal-orders-v1";
 const SK_STOCK  = "canal-stock-v1";
 
 // ← Collez ici l'URL de votre Google Apps Script après déploiement
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6yKbnqmcJ6dxkl2T4Balw66dKl8WCVkdN3P0d34FiucZqin7qM91_Q-k4a0mdazhh/exec; // Ex: "https://script.google.com/macros/s/XXXX/exec"
+const GOOGLE_SCRIPT_URL = ""; // Ex: "https://script.google.com/macros/s/XXXX/exec"
 
 // ─── DONNÉES CATALOGUE ───────────────────────────────────
 const PACKS = [
@@ -587,7 +587,7 @@ function Backoffice({stockState,setStockState}) {
       <div className="sec-title" style={{marginBottom:6}}>Tournées du jour</div>
       <div className="sec-sub" style={{marginBottom:16}}>Commandes groupées par créneau</div>
       {Object.keys(tournees).length===0
-        ? <div className="empty-st"><div className="ico">🛶</div><div>Aucune tournée aujourd'hui</div></div>
+        ? <div className="empty-st"><div className="ico">🛶</div><div>Aucune tournée aujourd&apos;hui</div></div>
         : <div className="tournees">{Object.entries(tournees).sort().map(([cr,cmds])=>(
             <div className="tournee-card" key={cr}>
               <div className="tournee-hd"><div className="tournee-lbl">⏰ {cr}</div><div className="tournee-cnt">{cmds.length}</div></div>
@@ -953,7 +953,7 @@ function Config() {
       {tab==="identite" && (
         <div className="cfg-section">
           <div className="cfg-title">Textes du site</div>
-          <div className="cfg-sub">Ce que voient vos clients sur la page d'accueil</div>
+          <div className="cfg-sub">Ce que voient vos clients sur la page d&apos;accueil</div>
           <div className="cfg-grid2">
             <div className="form-grp">
               <label className="form-lbl">Nom du site (nav)</label>
@@ -1019,7 +1019,7 @@ function Config() {
       {tab==="visuels" && (
         <div className="cfg-section">
           <div className="cfg-title">Couleurs du site</div>
-          <div className="cfg-sub">Changez l'ambiance visuelle en un clic — la prévisualisation est en direct</div>
+          <div className="cfg-sub">Changez l&apos;ambiance visuelle en un clic — la prévisualisation est en direct</div>
           {[
             ["colorDark",  "Couleur principale (fond nav, boutons)"],
             ["colorGold",  "Couleur dorée (accents, prix)"],
@@ -1053,7 +1053,7 @@ function Config() {
       {tab==="packs" && (
         <div className="cfg-section">
           <div className="cfg-title">Prix des packs</div>
-          <div className="cfg-sub">Modifiez les tarifs — les changements s'appliquent immédiatement sur le catalogue</div>
+          <div className="cfg-sub">Modifiez les tarifs — les changements s&apos;appliquent immédiatement sur le catalogue</div>
           {Object.entries(cfg.packPrices).map(([id, price])=>(
             <div className="cfg-pack-row" key={id}>
               <div className="cfg-pack-ico">{PACK_ICOS[id]}</div>

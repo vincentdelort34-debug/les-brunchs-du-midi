@@ -268,6 +268,9 @@ const WA        = `https://wa.me/${PHONE_WA}`;
 const SK_ORDERS = "canal-orders-v1";
 const SK_STOCK  = "canal-stock-v1";
 
+// ← Collez ici l'URL de votre Google Apps Script après déploiement
+const GOOGLE_SCRIPT_URL = ""; // Ex: "https://script.google.com/macros/s/XXXX/exec"
+
 // ─── DONNÉES CATALOGUE ───────────────────────────────────
 const PACKS = [
   { id:"apero-s",    cat:"apero",    sz:"S", label:"Apéro Classique",   sub:"Pour 2 personnes",    price:29, ico:"🥂", badge:null,
@@ -412,15 +415,46 @@ function Catalogue() {
   const formOk=form.name&&form.phone&&form.halte&&form.creneau;
   const canOrder=total>=29&&formOk;
 
-  const waMsg=()=>{
-    const txt=[`🛶 *Commande Lock &amp; Dock Delivery*`,``,
+  // Envoie la commande à Google Sheets + retourne le lien WhatsApp
+  const sendOrder = async () => {
+    const id = `LD${new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit"}).replace("/","")}-${Math.floor(Math.random()*900+100)}`;
+    const payload = {
+      id,
+      client: form.name,
+      phone:  form.phone,
+      halte:  form.halte,
+      creneau:form.creneau,
+      notes:  form.notes,
+      packs:  selPacks.map(p=>({label:p.label, price:p.price, id:p.id})),
+      extras: selExtras.map(e=>({label:e.label, price:e.price})),
+      total,
+    };
+
+    // Envoyer à Google Sheets si URL configurée
+    if (GOOGLE_SCRIPT_URL) {
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(payload),
+        });
+        showToast(`✅ Commande ${id} enregistrée`, "green");
+      } catch(err) {
+        console.warn("Google Sheets:", err);
+      }
+    }
+
+    // Ouvrir WhatsApp
+    const txt=[
+      `🛶 *Commande Lock & Dock Delivery*`,`Réf. ${id}`,``,
       `👤 *Client :* ${form.name}`,`📞 *Tél :* ${form.phone}`,
       `📍 *Halte :* ${form.halte}`,`🕐 *Créneau :* ${form.creneau}`,``,
       `📦 *Packs :*`,...selPacks.map(p=>`  • ${p.label} (${p.sub}) — ${p.price} €`),
       ...(selExtras.length?[``,`➕ *Extras :*`,...selExtras.map(e=>`  • ${e.label} — ${e.price} €`)]:[]),
       ``,`💰 *Total : ${total} €*`,...(form.notes?[``,`📝 ${form.notes}`]:[]),
     ].join("\n");
-    return `${WA}?text=${encodeURIComponent(txt)}`;
+    window.open(`${WA}?text=${encodeURIComponent(txt)}`, "_blank");
   };
 
   return (<>
@@ -483,7 +517,7 @@ function Catalogue() {
             </div>
             <div className="form-grp"><label className="form-lbl">Repère / infos</label><textarea className="form-ctrl" placeholder="Ex : bateau blanc, 3ème anneau côté droit…" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></div>
             {canOrder
-              ? <a className="btn-wa" href={waMsg()} target="_blank" rel="noreferrer"><WaIco size={20}/> Envoyer ma commande — {total} €</a>
+              ? <button className="btn-wa" onClick={sendOrder}><WaIco size={20}/> Envoyer ma commande — {total} €</button>
               : <button className="btn-wa" disabled><WaIco size={20}/> Envoyer ma commande — {total} €</button>}
             {!formOk&&<p className="notice info">Remplissez tous les champs pour activer la commande</p>}
           </>)}

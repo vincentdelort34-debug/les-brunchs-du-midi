@@ -507,11 +507,11 @@ function Catalogue() {
               {p.badge&&<div className="pack-badge">{p.badge}</div>}
             </div>
             <div className="pack-body"><ul className="pack-items">{p.items.map((it,i)=><li key={i}>{it}</li>)}</ul></div>
-            <div className="pack-ft">
+            <div className="pack-ft" style={{flexWrap:"wrap",gap:8}}>
               <div className="pack-price">{p.price} € <span>/ unité</span></div>
-              <div className="qty-ctrl" onClick={e=>e.stopPropagation()}>
+              <div style={{display:"flex",alignItems:"center",gap:6}} onClick={e=>e.stopPropagation()}>
                 {getPQty(p.id)>0&&<button className="qty-btn qbm" onClick={()=>remPack(p)}>−</button>}
-                {getPQty(p.id)>0&&<span className="qty-num" style={{color:"var(--canal)",fontSize:"1.1rem",minWidth:24}}>{getPQty(p.id)}</span>}
+                {getPQty(p.id)>0&&<span style={{fontFamily:"var(--fd)",fontSize:"1.2rem",fontWeight:600,color:"var(--canal)",minWidth:22,textAlign:"center"}}>{getPQty(p.id)}</span>}
                 <button className={`btn-choose${getPQty(p.id)>0?" in":""}`} onClick={()=>addPack(p)}>
                   {getPQty(p.id)>0?"+ Ajouter":"+ Choisir"}
                 </button>
@@ -589,27 +589,30 @@ function Backoffice({stockState,setStockState}) {
 
   // Charger les commandes depuis Google Sheets
   const syncFromSheets = async () => {
-    if (!GOOGLE_SCRIPT_URL) return;
+    if (!GOOGLE_SCRIPT_URL) { showToast("URL Google Script non configurée","red"); return; }
     setLoading(true);
     try {
-      const res = await fetch(GOOGLE_SCRIPT_URL+"?action=getOrders");
+      const res = await fetch(GOOGLE_SCRIPT_URL+"?action=getOrders", {mode:"cors"});
+      if (!res.ok) throw new Error("HTTP "+res.status);
       const data = await res.json();
-      if (data.success && data.orders.length > 0) {
-        // Fusionner avec les commandes locales (garder les statuts locaux si plus récents)
+      if (data.success && data.orders && data.orders.length > 0) {
         const sheetsOrders = data.orders.map(o => ({
-          id: o.id, client: o.client, phone: o.phone,
-          pack: o.pack, packId: "", extras: o.extras,
-          halte: o.halte, creneau: o.creneau,
-          date: o.date, total: o.total, notes: o.notes,
-          status: o.status,
+          id: o.id||"", client: o.client||"", phone: o.phone||"",
+          pack: o.pack||"", packId: "", extras: Array.isArray(o.extras)?o.extras:[],
+          halte: o.halte||"", creneau: o.creneau||"",
+          date: o.date||"", total: Number(o.total)||0, notes: o.notes||"",
+          status: o.status||"new",
         }));
         setOrders(sheetsOrders);
         lsSet(SK_ORDERS, sheetsOrders);
         setLastSync(new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}));
         showToast(`✅ ${sheetsOrders.length} commandes synchronisées`,"green");
+      } else {
+        showToast("Aucune commande dans le Sheet","");
       }
     } catch(err) {
-      showToast("❌ Erreur de synchronisation","red");
+      console.warn("Sync error:", err);
+      showToast("❌ Erreur sync — vérifiez l'URL du script","red");
     }
     setLoading(false);
   };
@@ -730,7 +733,7 @@ function Backoffice({stockState,setStockState}) {
               <option value="">Choisir un pack</option>{PACKS.map(p=><option key={p.id} value={p.label}>{p.label} — {p.price} €</option>)}</select></div>
           <div className="form-grp"><label className="form-lbl">Halte</label>
             <select className="form-ctrl" value={newOrd.halte} onChange={e=>setNewOrd({...newOrd,halte:e.target.value})}>
-              <option value="">Choisir une halte</option>{MHALTES.map(h=><option key={h}>{h}</option>)}</select></div>
+              <option value="">Choisir une halte</option>{HALTES.map(h=><option key={h}>{h}</option>)}</select></div>
         </div>
         <div className="form-row">
           <div className="form-grp"><label className="form-lbl">Créneau</label>
@@ -986,41 +989,76 @@ const DEFAULT_CONFIG = {
 };
 
 function Config() {
-  const [cfg, setCfg] = useState(() => lsGet(SK_CONFIG, DEFAULT_CONFIG));
-  const [tab, setTab] = useState("identite");
-  const [newHalte,   setNewHalte]   = useState("");
+  const [cfg, setCfg]           = useState(() => lsGet(SK_CONFIG, DEFAULT_CONFIG));
+  const [tab, setTab]           = useState("identite");
+  const [newHalte, setNewHalte] = useState("");
   const [newCreneau, setNewCreneau] = useState("");
+  const [newExtra, setNewExtra] = useState({ico:"🎁", label:"", price:0});
+  const [extrasList, setExtrasList] = useState(() => lsGet("canal-extras-v1", EXTRAS));
+  const [packsList, setPacksList]   = useState(() => lsGet("canal-packs-v1",  null));
+  const [editPack, setEditPack] = useState(null); // pack en cours d edition
+  const [editExtraIdx, setEditExtraIdx] = useState(null);
+  const [pwd, setPwd] = useState({old:"", new1:"", new2:""});
+
+  const applyColors = (c) => {
+    if(c.colorDark)  document.documentElement.style.setProperty("--dark",  c.colorDark);
+    if(c.colorGold)  document.documentElement.style.setProperty("--gold",  c.colorGold);
+    if(c.colorCanal) document.documentElement.style.setProperty("--canal", c.colorCanal);
+    if(c.colorOlive) document.documentElement.style.setProperty("--olive", c.colorOlive);
+  };
 
   const save = (patch) => {
     const next = {...cfg, ...patch};
     setCfg(next);
     lsSet(SK_CONFIG, next);
-    // Appliquer les couleurs live
-    if (patch.colorDark)  document.documentElement.style.setProperty("--dark",  patch.colorDark);
-    if (patch.colorGold)  document.documentElement.style.setProperty("--gold",  patch.colorGold);
-    if (patch.colorCanal) document.documentElement.style.setProperty("--canal", patch.colorCanal);
-    if (patch.colorOlive) document.documentElement.style.setProperty("--olive", patch.colorOlive);
+    applyColors(next);
     showToast("✅ Sauvegardé", "green");
   };
 
   const upd = (k,v) => setCfg(c => ({...c,[k]:v}));
   const updPrice = (id,v) => setCfg(c => ({...c, packPrices:{...c.packPrices,[id]:Number(v)}}));
 
-  const addHalte = () => {
-    if (!newHalte.trim()) return;
-    save({haltes:[...cfg.haltes, newHalte.trim()]});
-    setNewHalte("");
-  };
-  const delHalte = (i) => save({haltes: cfg.haltes.filter((_,idx)=>idx!==i)});
-  const editHalte = (i,v) => { const h=[...cfg.haltes]; h[i]=v; setCfg(c=>({...c,haltes:h})); };
+  // Haltes
+  const addHalte = () => { if(!newHalte.trim()) return; save({haltes:[...(cfg.haltes||HALTES), newHalte.trim()]}); setNewHalte(""); };
+  const delHalte = (i) => save({haltes:(cfg.haltes||HALTES).filter((_,idx)=>idx!==i)});
+  const editHalte = (i,v) => { const h=[...(cfg.haltes||HALTES)]; h[i]=v; setCfg(c=>({...c,haltes:h})); };
+  const moveHalte = (i, dir) => { const h=[...(cfg.haltes||HALTES)]; const j=i+dir; if(j<0||j>=h.length) return; [h[i],h[j]]=[h[j],h[i]]; save({haltes:h}); };
 
-  const addCreneau = () => {
-    if (!newCreneau.trim()) return;
-    save({creneaux:[...cfg.creneaux, newCreneau.trim()]});
-    setNewCreneau("");
+  // Créneaux
+  const addCreneau = () => { if(!newCreneau.trim()) return; save({creneaux:[...(cfg.creneaux||CRENEAUX), newCreneau.trim()]}); setNewCreneau(""); };
+  const delCreneau = (i) => save({creneaux:(cfg.creneaux||CRENEAUX).filter((_,idx)=>idx!==i)});
+  const editCreneau = (i,v) => { const c=[...(cfg.creneaux||CRENEAUX)]; c[i]=v; setCfg(s=>({...s,creneaux:c})); };
+  const moveCreneau = (i, dir) => { const c=[...(cfg.creneaux||CRENEAUX)]; const j=i+dir; if(j<0||j>=c.length) return; [c[i],c[j]]=[c[j],c[i]]; save({creneaux:c}); };
+
+  // Extras
+  const saveExtras = (list) => { setExtrasList(list); lsSet("canal-extras-v1", list); showToast("✅ Extras sauvegardés","green"); };
+  const delExtra = (i) => saveExtras(extrasList.filter((_,idx)=>idx!==i));
+  const addExtra = () => {
+    if(!newExtra.label.trim()) return;
+    saveExtras([...extrasList, {...newExtra, id:`extra-${Date.now()}`, price:Number(newExtra.price), stockRef:null}]);
+    setNewExtra({ico:"🎁", label:"", price:0});
   };
-  const delCreneau = (i) => save({creneaux: cfg.creneaux.filter((_,idx)=>idx!==i)});
-  const editCreneau = (i,v) => { const c=[...cfg.creneaux]; c[i]=v; setCfg(s=>({...s,creneaux:c})); };
+  const updExtra = (i, k, v) => { const l=[...extrasList]; l[i]={...l[i],[k]:v}; setExtrasList(l); };
+  const saveExtraInline = () => { saveExtras(extrasList); setEditExtraIdx(null); };
+
+  // Mot de passe
+  const changePwd = () => {
+    if(pwd.old !== ADMIN_PASSWORD) { showToast("❌ Ancien mot de passe incorrect","red"); return; }
+    if(pwd.new1.length < 4) { showToast("❌ Mot de passe trop court (4 car. min)","red"); return; }
+    if(pwd.new1 !== pwd.new2) { showToast("❌ Les mots de passe ne correspondent pas","red"); return; }
+    lsSet("canal-pwd-override", pwd.new1);
+    showToast("✅ Mot de passe changé — rechargez la page","green");
+    setPwd({old:"",new1:"",new2:""});
+  };
+
+  // Reset config
+  const resetConfig = () => {
+    if(!confirm("Remettre tous les paramètres par défaut ?")) return;
+    lsSet(SK_CONFIG, DEFAULT_CONFIG);
+    setCfg(DEFAULT_CONFIG);
+    applyColors(DEFAULT_CONFIG);
+    showToast("✅ Config remise à zéro","green");
+  };
 
   const PACK_LABELS = {
     "apero-s":"Apéro Classique","apero-m":"Apéro Signature","apero-l":"Apéro Premium",
@@ -1029,176 +1067,295 @@ function Config() {
   };
   const PACK_ICOS = {"apero-s":"🥂","apero-m":"🍷","apero-l":"🧀","ptitdej-s":"☀️","ptitdej-m":"🥐","ptitdej-l":"🍓","arrivee":"⚓","essentiel-s":"🧴"};
 
+  const TABS = [
+    ["identite","🏷️ Textes"],
+    ["contact","📬 Contact"],
+    ["visuels","🎨 Couleurs"],
+    ["packs","📦 Packs & Prix"],
+    ["extras","➕ Extras"],
+    ["haltes","📍 Haltes"],
+    ["creneaux","⏰ Créneaux"],
+    ["securite","🔐 Sécurité"],
+  ];
+
   return (
     <div className="page">
-      <div className="sec-head">
-        <div><div className="sec-title">Panneau de configuration</div><div className="sec-sub">Modifiez votre site sans toucher au code</div></div>
+      <div className="sec-head" style={{marginBottom:20}}>
+        <div>
+          <div className="sec-title">⚙️ Configuration</div>
+          <div className="sec-sub">Personnalisez votre site sans toucher au code</div>
+        </div>
+        <button onClick={resetConfig} style={{padding:"7px 14px",borderRadius:8,border:"1.5px solid #fca5a5",background:"transparent",color:"var(--red)",fontFamily:"var(--fs)",fontSize:".78rem",cursor:"pointer"}}>
+          ↺ Réinitialiser
+        </button>
       </div>
 
       <div className="cfg-tabs">
-        {[["identite","🏷️ Identité & textes"],["contact","📬 Contact & tarifs"],["visuels","🎨 Couleurs & visuels"],["packs","📦 Prix des packs"],["haltes","📍 Haltes & créneaux"]].map(([id,lbl])=>(
+        {TABS.map(([id,lbl])=>(
           <button key={id} className={`cfg-tab${tab===id?" active":""}`} onClick={()=>setTab(id)}>{lbl}</button>
         ))}
       </div>
 
-      {/* ── IDENTITÉ ── */}
+      {/* ══ TEXTES ══ */}
       {tab==="identite" && (
         <div className="cfg-section">
-          <div className="cfg-title">Textes du site</div>
-          <div className="cfg-sub">Ce que voient vos clients sur la page d&apos;accueil</div>
+          <div className="cfg-title">Textes de la page d&apos;accueil</div>
+          <div className="cfg-sub">Ce que voient vos clients en arrivant sur le site</div>
           <div className="cfg-grid2">
             <div className="form-grp">
-              <label className="form-lbl">Nom du site (nav)</label>
-              <input className="form-ctrl" value={cfg.siteName} onChange={e=>upd("siteName",e.target.value)}/>
+              <label className="form-lbl">Nom affiché dans la navigation</label>
+              <input className="form-ctrl" value={cfg.siteName||"Lock & Dock Delivery"} onChange={e=>upd("siteName",e.target.value)}/>
             </div>
             <div className="form-grp">
-              <label className="form-lbl">Tag line (petit texte haut)</label>
-              <input className="form-ctrl" value={cfg.heroTag} onChange={e=>upd("heroTag",e.target.value)}/>
+              <label className="form-lbl">Petit texte au-dessus du titre</label>
+              <input className="form-ctrl" value={cfg.heroTag||""} onChange={e=>upd("heroTag",e.target.value)}/>
             </div>
           </div>
           <div className="cfg-grid2">
             <div className="form-grp">
-              <label className="form-lbl">Titre principal</label>
-              <input className="form-ctrl" value={cfg.heroTitle} onChange={e=>upd("heroTitle",e.target.value)}/>
+              <label className="form-lbl">Titre (ligne normale)</label>
+              <input className="form-ctrl" value={cfg.heroTitle||""} onChange={e=>upd("heroTitle",e.target.value)}/>
             </div>
             <div className="form-grp">
-              <label className="form-lbl">Titre en italique doré</label>
-              <input className="form-ctrl" value={cfg.heroTitleEm} onChange={e=>upd("heroTitleEm",e.target.value)}/>
+              <label className="form-lbl">Titre (ligne en italique doré)</label>
+              <input className="form-ctrl" value={cfg.heroTitleEm||""} onChange={e=>upd("heroTitleEm",e.target.value)}/>
             </div>
           </div>
-          <div className="form-grp" style={{marginBottom:16}}>
-            <label className="form-lbl">Sous-titre</label>
-            <textarea className="form-ctrl" rows={3} value={cfg.heroSub} onChange={e=>upd("heroSub",e.target.value)}/>
+          <div className="form-grp" style={{marginBottom:18}}>
+            <label className="form-lbl">Description sous le titre</label>
+            <textarea className="form-ctrl" rows={3} value={cfg.heroSub||""} onChange={e=>upd("heroSub",e.target.value)}/>
           </div>
           <div className="live-preview">
-            <div style={{fontSize:".72rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu</div>
+            <div style={{fontSize:".7rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu en direct</div>
             <div className="preview-hero" style={{background:`linear-gradient(135deg,${cfg.colorDark||"#2a2318"} 0%,#3d3020 50%,${cfg.colorCanal||"#3d6b6b"} 100%)`}}>
-              <div style={{fontSize:".65rem",letterSpacing:".15em",textTransform:"uppercase",color:cfg.colorGold||"#c8a050",marginBottom:8}}>{cfg.heroTag}</div>
+              <div style={{fontSize:".62rem",letterSpacing:".15em",textTransform:"uppercase",color:cfg.colorGold||"#c8a050",marginBottom:8}}>{cfg.heroTag}</div>
               <div className="preview-title">{cfg.heroTitle}<br/><em style={{color:cfg.colorGold||"#c8a050"}}>{cfg.heroTitleEm}</em></div>
-              <div style={{fontSize:".78rem",opacity:.7,marginTop:8,maxWidth:340,margin:"8px auto 0"}}>{cfg.heroSub}</div>
+              <div style={{fontSize:".75rem",opacity:.7,marginTop:8}}>{cfg.heroSub}</div>
             </div>
           </div>
-          <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder</button>
+          <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder les textes</button>
         </div>
       )}
 
-      {/* ── CONTACT & TARIFS ── */}
+      {/* ══ CONTACT ══ */}
       {tab==="contact" && (
         <div className="cfg-section">
-          <div className="cfg-title">Contact & tarifs</div>
-          <div className="cfg-sub">Numéro WhatsApp, email et montant minimum</div>
+          <div className="cfg-title">Contact & commande minimum</div>
+          <div className="cfg-sub">Vos coordonnées affichées aux clients</div>
           <div className="cfg-grid2">
             <div className="form-grp">
-              <label className="form-lbl">WhatsApp (sans +, sans espaces)</label>
-              <input className="form-ctrl" placeholder="33767891074" value={cfg.whatsapp} onChange={e=>upd("whatsapp",e.target.value)}/>
-              <div style={{fontSize:".72rem",color:"var(--muted)",marginTop:4}}>Ex : 33767891074 pour le +33 7 67 89 10 74</div>
+              <label className="form-lbl">Numéro WhatsApp</label>
+              <input className="form-ctrl" placeholder="33767891074" value={cfg.whatsapp||""} onChange={e=>upd("whatsapp",e.target.value)}/>
+              <div style={{fontSize:".72rem",color:"var(--muted)",marginTop:4}}>Format : 33767891074 (sans + ni espaces)</div>
             </div>
             <div className="form-grp">
               <label className="form-lbl">Email de contact</label>
-              <input className="form-ctrl" type="email" placeholder="contact@lock-dock-delivery.fr" value={cfg.email} onChange={e=>upd("email",e.target.value)}/>
-              <div style={{fontSize:".72rem",color:"var(--muted)",marginTop:4}}>Affiché aux clients sur la page catalogue</div>
+              <input className="form-ctrl" type="email" placeholder="contact@lock-dock-delivery.fr" value={cfg.email||""} onChange={e=>upd("email",e.target.value)}/>
+              <div style={{fontSize:".72rem",color:"var(--muted)",marginTop:4}}>Affiché en bas du formulaire de commande</div>
             </div>
           </div>
-          <div className="form-grp" style={{maxWidth:200}}>
-            <label className="form-lbl">Commande minimum (€)</label>
-            <input className="form-ctrl" type="number" min="0" value={cfg.minCommande} onChange={e=>upd("minCommande",Number(e.target.value))}/>
+          <div className="cfg-grid2">
+            <div className="form-grp">
+              <label className="form-lbl">Montant minimum de commande (€)</label>
+              <input className="form-ctrl" type="number" min="0" value={cfg.minCommande||29} onChange={e=>upd("minCommande",Number(e.target.value))}/>
+            </div>
+            <div className="form-grp">
+              <label className="form-lbl">Zone de livraison (info client)</label>
+              <input className="form-ctrl" placeholder="Le Somail → Béziers" value={cfg.zone||""} onChange={e=>upd("zone",e.target.value)}/>
+            </div>
           </div>
           <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder</button>
         </div>
       )}
 
-      {/* ── VISUELS ── */}
+      {/* ══ COULEURS ══ */}
       {tab==="visuels" && (
         <div className="cfg-section">
-          <div className="cfg-title">Couleurs du site</div>
-          <div className="cfg-sub">Changez l&apos;ambiance visuelle en un clic — la prévisualisation est en direct</div>
+          <div className="cfg-title">Palette de couleurs</div>
+          <div className="cfg-sub">Modifiez les couleurs — l&apos;aperçu se met à jour en temps réel</div>
           {[
-            ["colorDark",  "Couleur principale (fond nav, boutons)"],
-            ["colorGold",  "Couleur dorée (accents, prix)"],
-            ["colorCanal", "Couleur canal (liens, sélections)"],
-            ["colorOlive", "Couleur olive (hover, secondaire)"],
-          ].map(([key,lbl])=>(
+            ["colorDark",  "Couleur principale",     "Fond nav, boutons, textes foncés"],
+            ["colorGold",  "Couleur dorée",           "Accents, prix, logo"],
+            ["colorCanal", "Couleur canal",           "Liens, sélections, badges"],
+            ["colorOlive", "Couleur olive",           "Hover, boutons secondaires"],
+          ].map(([key,lbl,desc])=>(
             <div className="cfg-color-row" key={key}>
-              <div className="cfg-color-lbl">{lbl}</div>
-              <input type="color" value={cfg[key]||"#000000"} onChange={e=>{upd(key,e.target.value); document.documentElement.style.setProperty(key==="colorDark"?"--dark":key==="colorGold"?"--gold":key==="colorCanal"?"--canal":"--olive",e.target.value);}}/>
-              <input className="cfg-color-hex form-ctrl" value={cfg[key]||""} onChange={e=>{upd(key,e.target.value); document.documentElement.style.setProperty(key==="colorDark"?"--dark":key==="colorGold"?"--gold":key==="colorCanal"?"--canal":"--olive",e.target.value);}} placeholder="#000000" style={{maxWidth:120}}/>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:500,fontSize:".85rem"}}>{lbl}</div>
+                <div style={{fontSize:".72rem",color:"var(--muted)"}}>{desc}</div>
+              </div>
+              <input type="color" value={cfg[key]||"#000000"} onChange={e=>{
+                upd(key,e.target.value);
+                const v=key==="colorDark"?"--dark":key==="colorGold"?"--gold":key==="colorCanal"?"--canal":"--olive";
+                document.documentElement.style.setProperty(v,e.target.value);
+              }}/>
+              <input className="form-ctrl" value={cfg[key]||""} onChange={e=>{
+                upd(key,e.target.value);
+                const v=key==="colorDark"?"--dark":key==="colorGold"?"--gold":key==="colorCanal"?"--canal":"--olive";
+                document.documentElement.style.setProperty(v,e.target.value);
+              }} placeholder="#000000" style={{maxWidth:110,fontFamily:"monospace",fontSize:".82rem"}}/>
             </div>
           ))}
-          <div className="live-preview">
-            <div style={{fontSize:".72rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu en direct</div>
-            <div className="preview-hero" style={{background:`linear-gradient(135deg,${cfg.colorDark} 0%,#3d3020 50%,${cfg.colorCanal} 100%)`}}>
-              <div style={{fontSize:".65rem",letterSpacing:".12em",textTransform:"uppercase",color:cfg.colorGold,marginBottom:6}}>{cfg.heroTag}</div>
-              <div className="preview-title">{cfg.heroTitle} <em style={{color:cfg.colorGold}}>{cfg.heroTitleEm}</em></div>
+          <div className="live-preview" style={{marginTop:16}}>
+            <div style={{fontSize:".7rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu</div>
+            <div className="preview-hero" style={{background:`linear-gradient(135deg,${cfg.colorDark||"#2a2318"} 0%,#3d3020 50%,${cfg.colorCanal||"#3d6b6b"} 100%)`}}>
+              <div style={{fontSize:".62rem",letterSpacing:".12em",textTransform:"uppercase",color:cfg.colorGold||"#c8a050",marginBottom:6}}>{cfg.heroTag}</div>
+              <div className="preview-title">{cfg.heroTitle} <em style={{color:cfg.colorGold||"#c8a050"}}>{cfg.heroTitleEm}</em></div>
             </div>
-            <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap"}}>
-              <span style={{background:cfg.colorDark,color:"white",padding:"6px 14px",borderRadius:7,fontSize:".8rem"}}>Bouton principal</span>
-              <span style={{background:cfg.colorOlive,color:"white",padding:"6px 14px",borderRadius:7,fontSize:".8rem"}}>Hover</span>
-              <span style={{background:cfg.colorCanal,color:"white",padding:"6px 14px",borderRadius:7,fontSize:".8rem"}}>Sélectionné</span>
-              <span style={{color:cfg.colorGold,fontFamily:"var(--fd)",fontSize:"1.4rem",fontWeight:600}}>52 €</span>
+            <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap",alignItems:"center"}}>
+              <span style={{background:cfg.colorDark,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Bouton principal</span>
+              <span style={{background:cfg.colorOlive,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Hover</span>
+              <span style={{background:cfg.colorCanal,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Sélectionné</span>
+              <span style={{color:cfg.colorGold,fontFamily:"var(--fd)",fontSize:"1.6rem",fontWeight:600}}>52 €</span>
             </div>
           </div>
           <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder les couleurs</button>
         </div>
       )}
 
-      {/* ── PRIX PACKS ── */}
+      {/* ══ PACKS & PRIX ══ */}
       {tab==="packs" && (
         <div className="cfg-section">
           <div className="cfg-title">Prix des packs</div>
-          <div className="cfg-sub">Modifiez les tarifs — les changements s&apos;appliquent immédiatement sur le catalogue</div>
-          {Object.entries(cfg.packPrices).map(([id, price])=>(
+          <div className="cfg-sub">Les nouveaux prix s&apos;appliquent immédiatement sur le catalogue client</div>
+          {Object.entries(cfg.packPrices||{}).map(([id,price])=>(
             <div className="cfg-pack-row" key={id}>
               <div className="cfg-pack-ico">{PACK_ICOS[id]}</div>
               <div style={{flex:1}}>
                 <div className="cfg-pack-name">{PACK_LABELS[id]}</div>
-                <div className="cfg-pack-cat">{id.includes("apero")?"Apéro":id.includes("ptitdej")?"Petit-déjeuner":"Essentiel"}</div>
+                <div className="cfg-pack-cat" style={{fontSize:".72rem",color:"var(--muted)"}}>
+                  {id.includes("apero")?"Apéro":id.includes("ptitdej")?"Petit-déjeuner":"Essentiel"}
+                </div>
               </div>
-              <input
-                type="number" min="0" step="1"
-                value={price}
-                onChange={e=>updPrice(id, e.target.value)}
-                style={{width:90,padding:"8px 10px",border:"1.5px solid var(--sand)",borderRadius:8,fontFamily:"var(--fd)",fontSize:"1.2rem",fontWeight:600,color:"var(--canal)",textAlign:"center",background:"var(--cream)",outline:"none"}}
-              />
-              <span style={{fontSize:".82rem",color:"var(--muted)"}}>€</span>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <input type="number" min="0" step="1" value={price}
+                  onChange={e=>updPrice(id,e.target.value)}
+                  style={{width:85,padding:"8px 10px",border:"1.5px solid var(--sand)",borderRadius:8,
+                    fontFamily:"var(--fd)",fontSize:"1.25rem",fontWeight:600,color:"var(--canal)",
+                    textAlign:"center",background:"var(--cream)",outline:"none"}}/>
+                <span style={{fontSize:".82rem",color:"var(--muted)"}}>€</span>
+              </div>
             </div>
           ))}
           <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder les prix</button>
         </div>
       )}
 
-      {/* ── HALTES & CRÉNEAUX ── */}
-      {tab==="haltes" && (<>
+      {/* ══ EXTRAS ══ */}
+      {tab==="extras" && (
         <div className="cfg-section">
-          <div className="cfg-title">Haltes couvertes</div>
-          <div className="cfg-sub">Ports et haltes nautiques où vous livrez</div>
-          {cfg.haltes.map((h,i)=>(
+          <div className="cfg-title">Extras à la carte</div>
+          <div className="cfg-sub">Gérez les produits supplémentaires proposés aux clients</div>
+          {extrasList.map((e,i)=>(
+            <div className="cfg-pack-row" key={e.id||i} style={{alignItems:"center"}}>
+              <input value={e.ico} onChange={v=>updExtra(i,"ico",v.target.value)}
+                style={{width:42,fontSize:"1.4rem",border:"1.5px solid var(--sand)",borderRadius:8,textAlign:"center",padding:"4px",background:"var(--cream)"}}/>
+              <div style={{flex:1}}>
+                {editExtraIdx===i ? (
+                  <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                    <input className="form-ctrl" value={e.label} onChange={v=>updExtra(i,"label",v.target.value)} style={{flex:1}}/>
+                    <input type="number" className="form-ctrl" value={e.price} onChange={v=>updExtra(i,"price",Number(v.target.value))} style={{width:70}}/>
+                    <span style={{fontSize:".82rem",color:"var(--muted)"}}>€</span>
+                    <button className="cfg-save-btn" style={{marginTop:0,padding:"6px 12px"}} onClick={saveExtraInline}>✓</button>
+                  </div>
+                ) : (
+                  <div style={{display:"flex",alignItems:"center",gap:12}}>
+                    <span style={{fontWeight:500,fontSize:".88rem"}}>{e.label}</span>
+                    <span style={{fontFamily:"var(--fd)",fontSize:"1.1rem",fontWeight:600,color:"var(--canal)"}}>{e.price} €</span>
+                  </div>
+                )}
+              </div>
+              <button className="btn-sm" onClick={()=>setEditExtraIdx(editExtraIdx===i?null:i)} style={{marginRight:4}}>✏️</button>
+              <button className="btn-sm d" onClick={()=>delExtra(i)}>✕</button>
+            </div>
+          ))}
+          <div style={{background:"var(--linen)",borderRadius:10,padding:16,marginTop:12}}>
+            <div style={{fontSize:".78rem",fontWeight:600,color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".06em"}}>Ajouter un extra</div>
+            <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+              <input value={newExtra.ico} onChange={e=>setNewExtra(x=>({...x,ico:e.target.value}))}
+                style={{width:42,fontSize:"1.3rem",border:"1.5px solid var(--sand)",borderRadius:8,textAlign:"center",padding:"6px",background:"white"}}/>
+              <input className="form-ctrl" placeholder="Nom du produit" value={newExtra.label}
+                onChange={e=>setNewExtra(x=>({...x,label:e.target.value}))} style={{flex:1,minWidth:140}}/>
+              <input type="number" className="form-ctrl" placeholder="Prix" value={newExtra.price||""}
+                onChange={e=>setNewExtra(x=>({...x,price:e.target.value}))} style={{width:80}}/>
+              <span style={{fontSize:".82rem",color:"var(--muted)"}}>€</span>
+              <button className="cfg-save-btn" style={{marginTop:0}} onClick={addExtra}>+ Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ HALTES ══ */}
+      {tab==="haltes" && (
+        <div className="cfg-section">
+          <div className="cfg-title">Haltes de livraison</div>
+          <div className="cfg-sub">Ports et haltes nautiques où vous livrez — glissez pour réordonner</div>
+          {(cfg.haltes||HALTES).map((h,i)=>(
             <div className="cfg-list-item" key={i}>
+              <span style={{fontSize:".9rem",cursor:"grab",color:"var(--muted)"}}>⠿</span>
               <span style={{fontSize:"1rem"}}>📍</span>
-              <input value={h} onChange={e=>editHalte(i,e.target.value)} onBlur={()=>save(cfg)}/>
+              <input value={h} onChange={e=>editHalte(i,e.target.value)} onBlur={()=>save(cfg)} style={{flex:1}}/>
+              <button onClick={()=>moveHalte(i,-1)} style={{border:"none",background:"none",cursor:"pointer",color:"var(--muted)",fontSize:".9rem",padding:"2px 4px"}} disabled={i===0}>▲</button>
+              <button onClick={()=>moveHalte(i,+1)} style={{border:"none",background:"none",cursor:"pointer",color:"var(--muted)",fontSize:".9rem",padding:"2px 4px"}} disabled={i===(cfg.haltes||HALTES).length-1}>▼</button>
               <button className="cfg-del-btn" onClick={()=>delHalte(i)}>✕</button>
             </div>
           ))}
-          <div style={{display:"flex",gap:8,marginTop:8}}>
-            <input className="form-ctrl" placeholder="Nouvelle halte…" value={newHalte} onChange={e=>setNewHalte(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addHalte()} style={{flex:1}}/>
+          <div style={{display:"flex",gap:8,marginTop:10}}>
+            <input className="form-ctrl" placeholder="Nouvelle halte…" value={newHalte}
+              onChange={e=>setNewHalte(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addHalte()} style={{flex:1}}/>
             <button className="cfg-save-btn" style={{marginTop:0}} onClick={addHalte}>+ Ajouter</button>
           </div>
         </div>
+      )}
+
+      {/* ══ CRÉNEAUX ══ */}
+      {tab==="creneaux" && (
         <div className="cfg-section">
           <div className="cfg-title">Créneaux de livraison</div>
-          <div className="cfg-sub">Plages horaires proposées aux clients</div>
-          {cfg.creneaux.map((c,i)=>(
+          <div className="cfg-sub">Plages horaires proposées aux clients lors de la commande</div>
+          {(cfg.creneaux||CRENEAUX).map((c,i)=>(
             <div className="cfg-list-item" key={i}>
               <span style={{fontSize:"1rem"}}>⏰</span>
-              <input value={c} onChange={e=>editCreneau(i,e.target.value)} onBlur={()=>save(cfg)}/>
+              <input value={c} onChange={e=>editCreneau(i,e.target.value)} onBlur={()=>save(cfg)} style={{flex:1}}/>
+              <button onClick={()=>moveCreneau(i,-1)} style={{border:"none",background:"none",cursor:"pointer",color:"var(--muted)",fontSize:".9rem",padding:"2px 4px"}} disabled={i===0}>▲</button>
+              <button onClick={()=>moveCreneau(i,+1)} style={{border:"none",background:"none",cursor:"pointer",color:"var(--muted)",fontSize:".9rem",padding:"2px 4px"}} disabled={i===(cfg.creneaux||CRENEAUX).length-1}>▼</button>
               <button className="cfg-del-btn" onClick={()=>delCreneau(i)}>✕</button>
             </div>
           ))}
-          <div style={{display:"flex",gap:8,marginTop:8}}>
-            <input className="form-ctrl" placeholder="Ex: 12h–13h" value={newCreneau} onChange={e=>setNewCreneau(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCreneau()} style={{flex:1}}/>
+          <div style={{display:"flex",gap:8,marginTop:10}}>
+            <input className="form-ctrl" placeholder="Ex: 12h–13h" value={newCreneau}
+              onChange={e=>setNewCreneau(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCreneau()} style={{flex:1}}/>
             <button className="cfg-save-btn" style={{marginTop:0}} onClick={addCreneau}>+ Ajouter</button>
           </div>
         </div>
-      </>)}
+      )}
+
+      {/* ══ SÉCURITÉ ══ */}
+      {tab==="securite" && (
+        <div className="cfg-section">
+          <div className="cfg-title">Changer le mot de passe admin</div>
+          <div className="cfg-sub">Protège l&apos;accès au back-office et au stock</div>
+          <div className="form-grp" style={{marginBottom:13,maxWidth:320}}>
+            <label className="form-lbl">Mot de passe actuel</label>
+            <input className="form-ctrl" type="password" placeholder="••••••••"
+              value={pwd.old} onChange={e=>setPwd(p=>({...p,old:e.target.value}))}/>
+          </div>
+          <div className="form-grp" style={{marginBottom:13,maxWidth:320}}>
+            <label className="form-lbl">Nouveau mot de passe</label>
+            <input className="form-ctrl" type="password" placeholder="••••••••"
+              value={pwd.new1} onChange={e=>setPwd(p=>({...p,new1:e.target.value}))}/>
+          </div>
+          <div className="form-grp" style={{marginBottom:18,maxWidth:320}}>
+            <label className="form-lbl">Confirmer le nouveau mot de passe</label>
+            <input className="form-ctrl" type="password" placeholder="••••••••"
+              value={pwd.new2} onChange={e=>setPwd(p=>({...p,new2:e.target.value}))}/>
+          </div>
+          <button className="cfg-save-btn" onClick={changePwd}>🔐 Changer le mot de passe</button>
+          <div style={{marginTop:16,padding:14,background:"var(--linen)",borderRadius:10,fontSize:".78rem",color:"var(--muted)"}}>
+            ⚠️ Le nouveau mot de passe est sauvegardé localement dans ce navigateur. Si vous utilisez un autre appareil, le mot de passe sera toujours <strong>canal2025</strong> (celui du code).
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1218,7 +1375,9 @@ function LoginModal({onSuccess, onCancel}) {
   const [err, setErr] = useState(false);
 
   const tryLogin = () => {
-    if (pwd === ADMIN_PASSWORD) { onSuccess(); setErr(false); }
+    const override = (() => { try { return localStorage.getItem("canal-pwd-override"); } catch(e){ return null; } })();
+    const correct = override || ADMIN_PASSWORD;
+    if (pwd === correct) { onSuccess(); setErr(false); }
     else { setErr(true); setPwd(""); }
   };
 
@@ -1300,6 +1459,11 @@ function App() {
           {isAdmin?"📦":"🔒"} Stock{isAdmin&&alerts>0&&<span className="dot"/>}
         </button>
         {isAdmin&&(
+          <button className={`nav-tab${view==="config"?" active":""}`} onClick={()=>setView("config")}>
+            ⚙️ Config
+          </button>
+        )}
+        {isAdmin&&(
           <button className="nav-tab" onClick={logout} style={{color:"var(--terra)",fontSize:".72rem"}}>
             Quitter ↩
           </button>
@@ -1310,6 +1474,7 @@ function App() {
     {view==="catalogue"  && <Catalogue/>}
     {view==="backoffice" && isAdmin && <Backoffice stockState={stockState} setStockState={setStockState}/>}
     {view==="stock"      && isAdmin && <Stock      stockState={stockState} setStockState={setStockState}/>}
+    {view==="config"     && isAdmin && <Config/>}
 
     {showLogin && (
       <LoginModal

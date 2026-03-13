@@ -36,9 +36,10 @@
            border-bottom:1px solid var(--sand); padding:0 20px; height:62px;
            display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
-    .nav-logo img { height:40px; width:40px; object-fit:contain; }
-    .nav-logo-text { font-family:var(--fd); font-size:1.2rem; font-weight:600; letter-spacing:.02em; white-space:nowrap; color:var(--dark); }
+    .nav-logo img { height:42px; width:42px; object-fit:contain; border-radius:8px; }
+    .nav-logo-text { font-family:var(--fd); font-size:1.25rem; font-weight:600; letter-spacing:.02em; white-space:nowrap; color:var(--dark); }
     .nav-logo-text span { color:var(--canal); }
+    .nav-badge-count { display:inline-flex; align-items:center; justify-content:center; background:var(--canal); color:white; border-radius:50%; width:20px; height:20px; font-size:.68rem; font-weight:700; margin-left:6px; vertical-align:middle; }
     .nav-tabs { display:flex; gap:3px; flex-shrink:0; }
     .nav-tab { padding:7px 13px; border-radius:8px; border:none; font-family:var(--fs);
                font-size:.78rem; font-weight:500; cursor:pointer; transition:all .2s;
@@ -47,8 +48,10 @@
     .nav-tab:hover:not(.active) { background:var(--sand); color:var(--dark); }
     .dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--red); margin-left:5px; vertical-align:middle; }
 
-    .hero { background:linear-gradient(135deg,var(--dark) 0%,#3d3020 50%,var(--canal) 100%);
-            color:var(--white); padding:64px 24px 48px; text-align:center; position:relative; overflow:hidden; }
+    .hero { background:linear-gradient(160deg,var(--dark) 0%,#3d3020 40%,var(--canal) 100%);
+            color:var(--white); padding:72px 24px 56px; text-align:center; position:relative; overflow:hidden; }
+    .hero-wave { position:absolute; bottom:0; left:0; width:100%; height:40px; 
+                 background:var(--cream); clip-path:ellipse(55% 100% at 50% 100%); }
     .hero::before { content:''; position:absolute; inset:0; pointer-events:none;
       background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23fff' fill-opacity='.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
     .hero-tag { font-size:.7rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); margin-bottom:14px; font-weight:500; position:relative; }
@@ -56,9 +59,10 @@
     .hero h1 em { font-style:italic; color:var(--gold); }
     .hero p { font-size:.95rem; color:rgba(255,255,255,.7); max-width:460px; margin:0 auto 28px; line-height:1.7; position:relative; }
     .hero-cta { display:inline-flex; align-items:center; gap:10px; background:#25d366; color:var(--white);
-                padding:13px 26px; border-radius:50px; font-weight:500; font-size:.88rem; text-decoration:none;
-                transition:transform .2s,box-shadow .2s; box-shadow:0 4px 20px rgba(37,211,102,.4); position:relative; }
-    .hero-cta:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(37,211,102,.5); }
+                padding:14px 30px; border-radius:50px; font-weight:600; font-size:.92rem; text-decoration:none;
+                transition:transform .25s,box-shadow .25s; box-shadow:0 6px 24px rgba(37,211,102,.45); position:relative;
+                letter-spacing:.02em; }
+    .hero-cta:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(37,211,102,.55); }
 
     .page { max-width:1060px; margin:0 auto; padding:36px 18px 60px; }
     .sec-title { font-family:var(--fd); font-size:1.7rem; font-weight:400; margin-bottom:6px; }
@@ -66,10 +70,10 @@
     .sec-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
     .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.7rem; font-weight:600; background:var(--linen); color:var(--muted); }
 
-    .f-btn { padding:7px 15px; border-radius:50px; border:1.5px solid var(--sand); background:var(--white);
-             color:var(--muted); font-size:.8rem; cursor:pointer; transition:all .2s; font-family:var(--fs); }
-    .f-btn.active { background:var(--dark); color:var(--white); border-color:var(--dark); }
-    .f-btn:hover:not(.active) { border-color:var(--muted); color:var(--dark); }
+    .f-btn { padding:8px 18px; border-radius:50px; border:1.5px solid var(--sand); background:var(--white);
+             color:var(--muted); font-size:.82rem; cursor:pointer; transition:all .25s; font-family:var(--fs); font-weight:500; }
+    .f-btn.active { background:var(--dark); color:var(--white); border-color:var(--dark); box-shadow:0 2px 12px rgba(42,35,24,.2); }
+    .f-btn:hover:not(.active) { border-color:var(--canal); color:var(--canal); background:#f0f6f6; }
     .filter-bar { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px; }
 
     .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:13px; margin-bottom:28px; }
@@ -81,9 +85,12 @@
 
     .packs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:18px; margin-bottom:48px; }
     .pack-card { background:var(--white); border-radius:var(--r); border:1px solid var(--sand);
-                 overflow:hidden; box-shadow:var(--sh); transition:box-shadow .25s,transform .25s; cursor:pointer; display:flex; flex-direction:column; }
+                 overflow:hidden; box-shadow:var(--sh); transition:box-shadow .25s,transform .25s; display:flex; flex-direction:column; position:relative; }
     .pack-card:hover { box-shadow:var(--sh2); transform:translateY(-3px); }
     .pack-card.sel { border-color:var(--canal); box-shadow:0 0 0 2px var(--canal2),var(--sh2); }
+    .pack-qty-badge { position:absolute; top:12px; right:12px; background:var(--canal); color:white;
+                      width:26px; height:26px; border-radius:50%; display:flex; align-items:center;
+                      justify-content:center; font-weight:700; font-size:.8rem; z-index:2; }
     .pack-hd { padding:22px 22px 14px; background:linear-gradient(135deg,var(--linen),var(--sand)); display:flex; align-items:flex-start; justify-content:space-between; }
     .pack-emoji { font-size:2.2rem; line-height:1; }
     .pack-badge { font-size:.68rem; background:var(--white); padding:4px 9px; border-radius:50px; font-weight:500; box-shadow:0 2px 8px rgba(0,0,0,.08); white-space:nowrap; }
@@ -314,6 +321,18 @@ const HALTES   = ["Le Somail","Argeliers","Ventenac-en-Minervois","Paraza","Roub
 const CRENEAUX = ["08h–09h","09h–10h","10h–11h","16h–17h","17h–18h","18h–19h","19h–20h"];
 const CATS     = [{id:"all",label:"Tous les packs",ico:"📦"},{id:"apero",label:"Apéro",ico:"🥂"},{id:"petitdej",label:"Petit-Déjeuner",ico:"☀️"},{id:"essentiel",label:"Essentiels",ico:"⚓"}];
 
+// Fusionne les prix/haltes/créneaux de la config avec les données statiques
+function getMergedData() {
+  const cfg = getConfig();
+  const prices = cfg.packPrices || {};
+  const packs = PACKS.map(p => ({...p, price: prices[p.id] || p.price}));
+  const haltes = cfg.haltes && cfg.haltes.length ? cfg.haltes : HALTES;
+  const creneaux = cfg.creneaux && cfg.creneaux.length ? cfg.creneaux : CRENEAUX;
+  const minCmd = cfg.minCommande || 29;
+  const wa = cfg.whatsapp || "33767891074";
+  return { packs, haltes, creneaux, minCmd, wa, cfg };
+}
+
 const DEFAULT_STOCK_PRODUITS = [
   {id:1, nom:"Rosé IGP Pays d'Oc 75cl",    cat:"Boissons",    unite:"bouteille",stock:24,seuil:10},
   {id:2, nom:"Vin rouge AOP Minervois 75cl",cat:"Boissons",    unite:"bouteille",stock:12,seuil:6},
@@ -401,19 +420,32 @@ const SBadge = ({status}) => {
 // ═══════════════════════════════════════════════════════
 function Catalogue() {
   const [cat,setCat]=useState("all");
-  const [selPacks,setSelPacks]=useState([]);
-  const [selExtras,setSelExtras]=useState([]);
+  // qty: {packId: number}
+  const [packQty,setPackQty]=useState({});
+  const [extraQty,setExtraQty]=useState({});
   const [form,setForm]=useState({name:"",phone:"",halte:"",creneau:"",notes:""});
 
-  const list=cat==="all"?PACKS:PACKS.filter(p=>p.cat===cat);
-  const inP=id=>selPacks.some(p=>p.id===id);
-  const inE=id=>selExtras.some(e=>e.id===id);
-  const togP=p=>setSelPacks(prev=>inP(p.id)?prev.filter(x=>x.id!==p.id):[...prev,p]);
-  const togE=e=>setSelExtras(prev=>inE(e.id)?prev.filter(x=>x.id!==e.id):[...prev,e]);
-  const total=selPacks.reduce((s,p)=>s+p.price,0)+selExtras.reduce((s,e)=>s+e.price,0);
-  const hasItems=selPacks.length>0||selExtras.length>0;
+  const {packs:MPACKS, haltes:MHALTES, creneaux:MCRENEAUX, minCmd, wa:WA_NUM, cfg} = getMergedData();
+  const MWA = `https://wa.me/${WA_NUM}`;
+  const list=cat==="all"?MPACKS:MPACKS.filter(p=>p.cat===cat);
+  
+  const getPQty=id=>packQty[id]||0;
+  const getEQty=id=>extraQty[id]||0;
+  
+  const addPack=p=>setPackQty(prev=>({...prev,[p.id]:(prev[p.id]||0)+1}));
+  const remPack=p=>setPackQty(prev=>{const n=(prev[p.id]||0)-1; if(n<=0){const r={...prev};delete r[p.id];return r;} return {...prev,[p.id]:n};});
+  const addExtra=e=>setExtraQty(prev=>({...prev,[e.id]:(prev[e.id]||0)+1}));
+  const remExtra=e=>setExtraQty(prev=>{const n=(prev[e.id]||0)-1; if(n<=0){const r={...prev};delete r[e.id];return r;} return {...prev,[e.id]:n};});
+
+  // Listes avec quantités pour le récap et l'envoi
+  const selPacks=PACKS.filter(p=>getPQty(p.id)>0);
+  const selExtras=EXTRAS.filter(e=>getEQty(e.id)>0);
+  const totalPacks=PACKS.reduce((s,p)=>s+p.price*getPQty(p.id),0);
+  const totalExtras=EXTRAS.reduce((s,e)=>s+e.price*getEQty(e.id),0);
+  const total=totalPacks+totalExtras;
+  const hasItems=total>0;
   const formOk=form.name&&form.phone&&form.halte&&form.creneau;
-  const canOrder=total>=29&&formOk;
+  const canOrder=total>=minCmd&&formOk;
 
   // Envoie la commande à Google Sheets + retourne le lien WhatsApp
   const sendOrder = () => {
@@ -424,21 +456,21 @@ function Catalogue() {
       `🛶 *Commande Lock & Dock Delivery*`,`Réf. ${id}`,``,
       `👤 *Client :* ${form.name}`,`📞 *Tél :* ${form.phone}`,
       `📍 *Halte :* ${form.halte}`,`🕐 *Créneau :* ${form.creneau}`,``,
-      `📦 *Packs :*`,...selPacks.map(p=>`  • ${p.label} (${p.sub}) — ${p.price} €`),
-      ...(selExtras.length?[``,`➕ *Extras :*`,...selExtras.map(e=>`  • ${e.label} — ${e.price} €`)]:[]),
+      `📦 *Packs :*`,...selPacks.map(p=>`  • ${getPQty(p.id)}× ${p.label} — ${p.price*getPQty(p.id)} €`),
+      ...(selExtras.length?[``,`➕ *Extras :*`,...selExtras.map(e=>`  • ${getEQty(e.id)}× ${e.label} — ${e.price*getEQty(e.id)} €`)]:[]),
       ``,`💰 *Total : ${total} €*`,...(form.notes?[``,`📝 ${form.notes}`]:[]),
     ].join("\n");
     
     // Ouvrir WhatsApp IMMÉDIATEMENT (doit être dans le même clic)
-    window.open(`${WA}?text=${encodeURIComponent(txt)}`, "_blank");
+    window.open(`${MWA}?text=${encodeURIComponent(txt)}`, "_blank");
 
     // Envoyer à Google Sheets en arrière-plan
     if (GOOGLE_SCRIPT_URL) {
       const payload = {
         id, client:form.name, phone:form.phone, halte:form.halte,
         creneau:form.creneau, notes:form.notes,
-        packs:selPacks.map(p=>({label:p.label,price:p.price,id:p.id})),
-        extras:selExtras.map(e=>({label:e.label,price:e.price})),
+        packs:selPacks.map(p=>({label:`${getPQty(p.id)}× ${p.label}`,price:p.price*getPQty(p.id),id:p.id})),
+        extras:selExtras.map(e=>({label:`${getEQty(e.id)}× ${e.label}`,price:e.price*getEQty(e.id)})),
         total,
       };
       fetch(GOOGLE_SCRIPT_URL, {
@@ -453,16 +485,18 @@ function Catalogue() {
   return (<>
     <div className="hero">
       <img src={LOGO_MD} alt="Lock & Dock Delivery" style={{width:120,height:120,objectFit:"contain",marginBottom:16,filter:"brightness(0) invert(1)",opacity:.92,position:"relative"}}/>
-      <div className="hero-tag">⚓ Canal du Midi · Lock & Dock Delivery</div>
-      <h1>Vos saveurs<br/><em>livrées à bord</em></h1>
-      <p>Apéros, petits-déjeuners et essentiels livrés directement sur votre ponton, entre Le Somail et Béziers.</p>
-      <a className="hero-cta" href={WA} target="_blank" rel="noreferrer"><WaIco/> Commander via WhatsApp</a>
+      <div className="hero-tag">{cfg.heroTag||"⚓ Canal du Midi · Lock & Dock Delivery"}</div>
+      <h1>{cfg.heroTitle||"Vos saveurs"}<br/><em>{cfg.heroTitleEm||"livrées à bord"}</em></h1>
+      <p>{cfg.heroSub||"Apéros, petits-déjeuners et essentiels livrés directement sur votre ponton, entre Le Somail et Béziers."}</p>
+      <a className="hero-cta" href={MWA} target="_blank" rel="noreferrer"><WaIco/> Commander via WhatsApp</a>
+      <div className="hero-wave"/>
     </div>
     <div className="page">
       <div className="filter-bar">{CATS.map(c=><button key={c.id} className={`f-btn${cat===c.id?" active":""}`} onClick={()=>setCat(c.id)}>{c.ico} {c.label}</button>)}</div>
       <div className="packs-grid">
         {list.map(p=>(
-          <div key={p.id} className={`pack-card${inP(p.id)?" sel":""}`} onClick={()=>togP(p)}>
+          <div key={p.id} className={`pack-card${getPQty(p.id)>0?" sel":""}`}>
+            {getPQty(p.id)>0&&<div className="pack-qty-badge">{getPQty(p.id)}</div>}
             <div className="pack-hd">
               <div>
                 <div className="pack-emoji">{p.ico}</div>
@@ -474,8 +508,14 @@ function Catalogue() {
             </div>
             <div className="pack-body"><ul className="pack-items">{p.items.map((it,i)=><li key={i}>{it}</li>)}</ul></div>
             <div className="pack-ft">
-              <div className="pack-price">{p.price} € <span>livraison incluse</span></div>
-              <button className={`btn-choose${inP(p.id)?" in":""}`} onClick={e=>{e.stopPropagation();togP(p);}}>{inP(p.id)?"✓ Sélectionné":"+ Choisir"}</button>
+              <div className="pack-price">{p.price} € <span>/ unité</span></div>
+              <div className="qty-ctrl" onClick={e=>e.stopPropagation()}>
+                {getPQty(p.id)>0&&<button className="qty-btn qbm" onClick={()=>remPack(p)}>−</button>}
+                {getPQty(p.id)>0&&<span className="qty-num" style={{color:"var(--canal)",fontSize:"1.1rem",minWidth:24}}>{getPQty(p.id)}</span>}
+                <button className={`btn-choose${getPQty(p.id)>0?" in":""}`} onClick={()=>addPack(p)}>
+                  {getPQty(p.id)>0?"+ Ajouter":"+ Choisir"}
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -484,35 +524,50 @@ function Catalogue() {
       <div className="sec-sub">Ajoutez des produits à votre commande principale</div>
       <div className="extras-grid">
         {EXTRAS.map(e=>(
-          <div key={e.id} className={`extra-card${inE(e.id)?" sel":""}`} onClick={()=>togE(e)}>
+          <div key={e.id} className={`extra-card${getEQty(e.id)>0?" sel":""}`}>
             <div className="extra-emoji">{e.ico}</div>
-            <div><div className="extra-lbl">{e.label}</div><div className="extra-prc">{e.price} €</div></div>
-            <div className="extra-chk">{inE(e.id)?"✓":""}</div>
+            <div style={{flex:1}}><div className="extra-lbl">{e.label}</div><div className="extra-prc">{e.price} €</div></div>
+            <div className="qty-ctrl" style={{gap:5}}>
+              {getEQty(e.id)>0&&<button className="qty-btn qbm" onClick={()=>remExtra(e)}>−</button>}
+              {getEQty(e.id)>0&&<span style={{fontFamily:"var(--fd)",fontSize:"1.1rem",fontWeight:600,color:"var(--canal)",minWidth:18,textAlign:"center"}}>{getEQty(e.id)}</span>}
+              <button className="qty-btn qbp" onClick={()=>addExtra(e)}>+</button>
+            </div>
           </div>
         ))}
       </div>
       {hasItems&&(
         <div className="order-panel">
           <div className="form-title">🛒 Récapitulatif & Commande</div>
-          {selPacks.map(p=><div className="order-line" key={p.id}><span>{p.ico} {p.label} <span className="tag">{p.sz}</span></span><strong>{p.price} €</strong></div>)}
-          {selExtras.map(e=><div className="order-line" key={e.id}><span>{e.ico} {e.label}</span><strong>{e.price} €</strong></div>)}
+          {selPacks.map(p=>(
+            <div className="order-line" key={p.id}>
+              <span>{p.ico} {getPQty(p.id)>1&&<span className="tag">{getPQty(p.id)}×</span>} {p.label} <span className="tag">{p.sz}</span></span>
+              <strong>{p.price*getPQty(p.id)} €</strong>
+            </div>
+          ))}
+          {selExtras.map(e=>(
+            <div className="order-line" key={e.id}>
+              <span>{e.ico} {getEQty(e.id)>1&&<span className="tag">{getEQty(e.id)}×</span>} {e.label}</span>
+              <strong>{e.price*getEQty(e.id)} €</strong>
+            </div>
+          ))}
           <div className="order-total"><span>Total</span><span>{total} €</span></div>
-          {total<29&&<p className="notice warn">⚠️ Minimum de commande : 29 € (livraison incluse)</p>}
-          {total>=29&&(<>
+          {total<minCmd&&<p className="notice warn">⚠️ Minimum de commande : {minCmd} € (livraison incluse)</p>}
+          {total>=minCmd&&(<>
             <div style={{height:18}}/>
             <div className="form-row">
               <div className="form-grp"><label className="form-lbl">Nom / Prénom</label><input className="form-ctrl" placeholder="M. Dupont" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></div>
               <div className="form-grp"><label className="form-lbl">Téléphone</label><input className="form-ctrl" placeholder="06 00 00 00 00" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})}/></div>
             </div>
             <div className="form-row">
-              <div className="form-grp"><label className="form-lbl">Halte / Port</label><select className="form-ctrl" value={form.halte} onChange={e=>setForm({...form,halte:e.target.value})}><option value="">Choisir une halte</option>{HALTES.map(h=><option key={h}>{h}</option>)}</select></div>
-              <div className="form-grp"><label className="form-lbl">Créneau souhaité</label><select className="form-ctrl" value={form.creneau} onChange={e=>setForm({...form,creneau:e.target.value})}><option value="">Choisir un créneau</option>{CRENEAUX.map(c=><option key={c}>{c}</option>)}</select></div>
+              <div className="form-grp"><label className="form-lbl">Halte / Port</label><select className="form-ctrl" value={form.halte} onChange={e=>setForm({...form,halte:e.target.value})}><option value="">Choisir une halte</option>{MHALTES.map(h=><option key={h}>{h}</option>)}</select></div>
+              <div className="form-grp"><label className="form-lbl">Créneau souhaité</label><select className="form-ctrl" value={form.creneau} onChange={e=>setForm({...form,creneau:e.target.value})}><option value="">Choisir un créneau</option>{MCRENEAUX.map(c=><option key={c}>{c}</option>)}</select></div>
             </div>
             <div className="form-grp"><label className="form-lbl">Repère / infos</label><textarea className="form-ctrl" placeholder="Ex : bateau blanc, 3ème anneau côté droit…" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></div>
             {canOrder
               ? <button className="btn-wa" onClick={sendOrder}><WaIco size={20}/> Envoyer ma commande — {total} €</button>
               : <button className="btn-wa" disabled><WaIco size={20}/> Envoyer ma commande — {total} €</button>}
             {!formOk&&<p className="notice info">Remplissez tous les champs pour activer la commande</p>}
+            {cfg.email&&<p className="notice info" style={{marginTop:8}}>📧 <a href={`mailto:${cfg.email}`} style={{color:"var(--canal)"}}>{cfg.email}</a></p>}
           </>)}
         </div>
       )}
@@ -675,7 +730,7 @@ function Backoffice({stockState,setStockState}) {
               <option value="">Choisir un pack</option>{PACKS.map(p=><option key={p.id} value={p.label}>{p.label} — {p.price} €</option>)}</select></div>
           <div className="form-grp"><label className="form-lbl">Halte</label>
             <select className="form-ctrl" value={newOrd.halte} onChange={e=>setNewOrd({...newOrd,halte:e.target.value})}>
-              <option value="">Choisir une halte</option>{HALTES.map(h=><option key={h}>{h}</option>)}</select></div>
+              <option value="">Choisir une halte</option>{MHALTES.map(h=><option key={h}>{h}</option>)}</select></div>
         </div>
         <div className="form-row">
           <div className="form-grp"><label className="form-lbl">Créneau</label>

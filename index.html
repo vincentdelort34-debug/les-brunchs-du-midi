@@ -527,8 +527,44 @@ function Backoffice({stockState,setStockState}) {
   const [orders,setOrders]=useState(()=>lsGet(SK_ORDERS,MOCK_ORDERS));
   const [fstat,setFstat]=useState("all");
   const [newOrd,setNewOrd]=useState({client:"",phone:"",pack:"",packId:"",halte:"",creneau:""});
+  const [loading,setLoading]=useState(false);
+  const [lastSync,setLastSync]=useState(null);
 
   useEffect(()=>{ lsSet(SK_ORDERS,orders); },[orders]);
+
+  // Charger les commandes depuis Google Sheets
+  const syncFromSheets = async () => {
+    if (!GOOGLE_SCRIPT_URL) return;
+    setLoading(true);
+    try {
+      const res = await fetch(GOOGLE_SCRIPT_URL+"?action=getOrders");
+      const data = await res.json();
+      if (data.success && data.orders.length > 0) {
+        // Fusionner avec les commandes locales (garder les statuts locaux si plus récents)
+        const sheetsOrders = data.orders.map(o => ({
+          id: o.id, client: o.client, phone: o.phone,
+          pack: o.pack, packId: "", extras: o.extras,
+          halte: o.halte, creneau: o.creneau,
+          date: o.date, total: o.total, notes: o.notes,
+          status: o.status,
+        }));
+        setOrders(sheetsOrders);
+        lsSet(SK_ORDERS, sheetsOrders);
+        setLastSync(new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}));
+        showToast(`✅ ${sheetsOrders.length} commandes synchronisées`,"green");
+      }
+    } catch(err) {
+      showToast("❌ Erreur de synchronisation","red");
+    }
+    setLoading(false);
+  };
+
+  // Mettre à jour le statut dans Google Sheets
+  const updateSheetStatus = (id, status) => {
+    if (!GOOGLE_SCRIPT_URL) return;
+    fetch(`${GOOGLE_SCRIPT_URL}?action=updateStatus&id=${id}&status=${status}`)
+      .catch(err => console.warn("Sheet status update:", err));
+  };
 
   const active=orders.filter(o=>o.status!=="cancelled");
   const totalCA=active.reduce((s,o)=>s+o.total,0);
@@ -543,6 +579,7 @@ function Backoffice({stockState,setStockState}) {
       deductStock(order,stockState,setStockState);
     }
     setOrders(prev=>prev.map(o=>o.id===id?{...o,status:st}:o));
+    updateSheetStatus(id, st);
   };
 
   const tournees={};
@@ -566,8 +603,15 @@ function Backoffice({stockState,setStockState}) {
   return (
     <div className="page">
       <div className="sec-head">
-        <div><div className="sec-title">Back-office · Tableau de bord</div><div className="sec-sub">Gestion des commandes et tournées</div></div>
-        <div className="bo-date">📅 {new Date().toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</div>
+        <div><div className="sec-title">Back-office · Tableau de bord</div>
+        <div className="sec-sub">Gestion des commandes{lastSync&&<span style={{color:"var(--green)",marginLeft:8}}>· Sync {lastSync}</span>}</div></div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <button onClick={syncFromSheets} disabled={loading}
+            style={{padding:"7px 16px",borderRadius:8,border:"1.5px solid var(--canal)",background:"transparent",color:"var(--canal)",fontFamily:"var(--fs)",fontSize:".8rem",cursor:"pointer",transition:"all .2s",opacity:loading?0.6:1}}>
+            {loading?"⏳ Sync...":"🔄 Sync Google Sheets"}
+          </button>
+          <div className="bo-date">📅 {new Date().toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</div>
+        </div>
       </div>
       <div className="stats-grid">
         <div className="stat-card"><div className="stat-lbl">Actives</div><div className="stat-val sv-blue">{active.length}</div></div>

@@ -484,7 +484,8 @@ function Catalogue() {
 
   return (<>
     <div className="hero">
-      <img src={LOGO_MD} alt="Lock & Dock Delivery" style={{width:120,height:120,objectFit:"contain",marginBottom:16,filter:"brightness(0) invert(1)",opacity:.92,position:"relative"}}/>
+      <img src={cfg.logoUrl||LOGO_MD} alt="Lock & Dock Delivery" style={{width:120,height:120,objectFit:"contain",marginBottom:16,filter:cfg.logoUrl?"none":"brightness(0) invert(1)",opacity:.92,position:"relative"}}/>
+      {cfg.visual2&&<div style={{fontSize:"3rem",marginBottom:8,position:"relative"}}>{cfg.visual2}</div>}
       <div className="hero-tag">{cfg.heroTag||"⚓ Canal du Midi · Lock & Dock Delivery"}</div>
       <h1>{cfg.heroTitle||"Vos saveurs"}<br/><em>{cfg.heroTitleEm||"livrées à bord"}</em></h1>
       <p>{cfg.heroSub||"Apéros, petits-déjeuners et essentiels livrés directement sur votre ponton, entre Le Somail et Béziers."}</p>
@@ -977,6 +978,13 @@ const DEFAULT_CONFIG = {
   colorGold:   "#c8a050",
   colorCanal:  "#3d6b6b",
   colorOlive:  "#5c6340",
+  // Visuels personnalisables
+  logoUrl:     "", // URL ou base64 du logo
+  visual1:     "", // Visuel libre 1 (hero background image)
+  visual2:     "", // Visuel libre 2 (carte pack background)  
+  visual3:     "", // Emoji ou texte personnalisé hero
+  visual4:     "", // Emoji ou icône nav
+  visual5:     "", // Image de fond générale
   // Packs (prix modifiables)
   packPrices: {
     "apero-s":52, "apero-m":52, "apero-l":89,
@@ -1168,16 +1176,103 @@ function Config() {
         </div>
       )}
 
-      {/* ══ COULEURS ══ */}
-      {tab==="visuels" && (
+      {/* ══ COULEURS & VISUELS ══ */}
+      {tab==="visuels" && (<>
+
+        {/* Logo */}
         <div className="cfg-section">
-          <div className="cfg-title">Palette de couleurs</div>
-          <div className="cfg-sub">Modifiez les couleurs — l&apos;aperçu se met à jour en temps réel</div>
+          <div className="cfg-title">🖼️ Logo</div>
+          <div className="cfg-sub">Collez une URL d&apos;image ou uploadez depuis votre appareil</div>
+          <div style={{display:"flex",gap:16,alignItems:"flex-start",flexWrap:"wrap"}}>
+            <div style={{flex:1,minWidth:200}}>
+              <div className="form-grp" style={{marginBottom:10}}>
+                <label className="form-lbl">URL du logo (lien web)</label>
+                <input className="form-ctrl" placeholder="https://monsite.com/logo.png"
+                  value={cfg.logoUrl||""} onChange={e=>upd("logoUrl",e.target.value)}/>
+                <div style={{fontSize:".72rem",color:"var(--muted)",marginTop:4}}>
+                  Ou uploadez depuis votre appareil →
+                </div>
+              </div>
+              <div className="form-grp">
+                <label className="form-lbl">Uploader depuis votre Mac/téléphone</label>
+                <input type="file" accept="image/*" onChange={e=>{
+                  const f=e.target.files[0]; if(!f) return;
+                  const r=new FileReader();
+                  r.onload=ev=>{ upd("logoUrl",ev.target.result); };
+                  r.readAsDataURL(f);
+                }} style={{padding:"8px 0",fontSize:".82rem",color:"var(--muted)"}}/>
+              </div>
+            </div>
+            <div style={{textAlign:"center"}}>
+              <div style={{fontSize:".7rem",color:"var(--muted)",marginBottom:8,textTransform:"uppercase",letterSpacing:".08em"}}>Aperçu</div>
+              <div style={{width:100,height:100,borderRadius:12,border:"2px dashed var(--sand)",
+                display:"flex",alignItems:"center",justifyContent:"center",background:"var(--linen)",overflow:"hidden"}}>
+                {cfg.logoUrl
+                  ? <img src={cfg.logoUrl} alt="logo" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+                  : <span style={{fontSize:"2rem",opacity:.3}}>🖼️</span>}
+              </div>
+              <div style={{fontSize:".68rem",color:"var(--muted)",marginTop:6}}>Nav & Hero</div>
+            </div>
+          </div>
+          <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder le logo</button>
+        </div>
+
+        {/* 4 visuels libres */}
+        <div className="cfg-section">
+          <div className="cfg-title">✨ Visuels personnalisables</div>
+          <div className="cfg-sub">4 zones libres — photo, emoji, couleur ou lien image</div>
           {[
-            ["colorDark",  "Couleur principale",     "Fond nav, boutons, textes foncés"],
-            ["colorGold",  "Couleur dorée",           "Accents, prix, logo"],
-            ["colorCanal", "Couleur canal",           "Liens, sélections, badges"],
-            ["colorOlive", "Couleur olive",           "Hover, boutons secondaires"],
+            ["visual1","🌅 Image de fond du hero","Remplace le dégradé sombre par une photo","ex: URL d&apos;une photo du canal"],
+            ["visual2","🗺️ Emoji ou icône principal hero","Affiché au centre du hero au-dessus du titre","ex: ⚓ 🛶 🌊"],
+            ["visual3","🃏 Image de fond des cartes packs","Photo ou texture pour les en-têtes de packs","ex: URL d&apos;une texture lin"],
+            ["visual4","🎨 Image ou motif de fond général","Appliqué en filigrane sur tout le site","ex: URL d&apos;un motif subtil"],
+          ].map(([key,lbl,desc,hint],i)=>(
+            <div key={key} style={{marginBottom:20,paddingBottom:20,borderBottom:i<3?"1px solid var(--sand)":"none"}}>
+              <div style={{display:"flex",gap:14,alignItems:"flex-start",flexWrap:"wrap"}}>
+                <div style={{flex:1,minWidth:200}}>
+                  <div style={{fontWeight:600,fontSize:".88rem",marginBottom:3}}>{lbl}</div>
+                  <div style={{fontSize:".74rem",color:"var(--muted)",marginBottom:10}}>{desc}</div>
+                  <div className="form-grp" style={{marginBottom:8}}>
+                    <label className="form-lbl">URL ou emoji</label>
+                    <input className="form-ctrl" placeholder={hint}
+                      value={cfg[key]||""} onChange={e=>upd(key,e.target.value)}/>
+                  </div>
+                  <div className="form-grp">
+                    <label className="form-lbl">Ou uploader un fichier</label>
+                    <input type="file" accept="image/*" onChange={e=>{
+                      const f=e.target.files[0]; if(!f) return;
+                      const r=new FileReader();
+                      r.onload=ev=>upd(key,ev.target.result);
+                      r.readAsDataURL(f);
+                    }} style={{fontSize:".8rem",color:"var(--muted)",padding:"6px 0"}}/>
+                  </div>
+                </div>
+                <div style={{textAlign:"center",flexShrink:0}}>
+                  <div style={{width:80,height:80,borderRadius:10,border:"2px dashed var(--sand)",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    background:"var(--linen)",overflow:"hidden",fontSize:"2rem"}}>
+                    {cfg[key]
+                      ? (cfg[key].startsWith("http")||cfg[key].startsWith("data"))
+                        ? <img src={cfg[key]} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                        : <span>{cfg[key]}</span>
+                      : <span style={{opacity:.3}}>?</span>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder les visuels</button>
+        </div>
+
+        {/* Couleurs */}
+        <div className="cfg-section">
+          <div className="cfg-title">🎨 Palette de couleurs</div>
+          <div className="cfg-sub">L&apos;aperçu se met à jour en temps réel</div>
+          {[
+            ["colorDark",  "Couleur principale",  "Fond nav, boutons, textes foncés"],
+            ["colorGold",  "Couleur dorée",        "Accents, prix, logo"],
+            ["colorCanal", "Couleur canal",        "Liens, sélections, badges"],
+            ["colorOlive", "Couleur olive",        "Hover, boutons secondaires"],
           ].map(([key,lbl,desc])=>(
             <div className="cfg-color-row" key={key}>
               <div style={{flex:1}}>
@@ -1197,21 +1292,21 @@ function Config() {
             </div>
           ))}
           <div className="live-preview" style={{marginTop:16}}>
-            <div style={{fontSize:".7rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu</div>
+            <div style={{fontSize:".7rem",color:"var(--muted)",marginBottom:10,textTransform:"uppercase",letterSpacing:".1em"}}>Aperçu couleurs</div>
             <div className="preview-hero" style={{background:`linear-gradient(135deg,${cfg.colorDark||"#2a2318"} 0%,#3d3020 50%,${cfg.colorCanal||"#3d6b6b"} 100%)`}}>
               <div style={{fontSize:".62rem",letterSpacing:".12em",textTransform:"uppercase",color:cfg.colorGold||"#c8a050",marginBottom:6}}>{cfg.heroTag}</div>
               <div className="preview-title">{cfg.heroTitle} <em style={{color:cfg.colorGold||"#c8a050"}}>{cfg.heroTitleEm}</em></div>
             </div>
             <div style={{display:"flex",gap:8,marginTop:12,flexWrap:"wrap",alignItems:"center"}}>
-              <span style={{background:cfg.colorDark,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Bouton principal</span>
+              <span style={{background:cfg.colorDark,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Bouton</span>
               <span style={{background:cfg.colorOlive,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Hover</span>
-              <span style={{background:cfg.colorCanal,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Sélectionné</span>
+              <span style={{background:cfg.colorCanal,color:"white",padding:"7px 16px",borderRadius:8,fontSize:".82rem"}}>Sélection</span>
               <span style={{color:cfg.colorGold,fontFamily:"var(--fd)",fontSize:"1.6rem",fontWeight:600}}>52 €</span>
             </div>
           </div>
           <button className="cfg-save-btn" onClick={()=>save(cfg)}>💾 Sauvegarder les couleurs</button>
         </div>
-      )}
+      </>)}
 
       {/* ══ PACKS & PRIX ══ */}
       {tab==="packs" && (
@@ -1445,7 +1540,7 @@ function App() {
   return (<>
     <nav className="nav">
       <div className="nav-logo">
-        <img src={LOGO_SM} alt="Lock & Dock Delivery"/>
+        <img src={(()=>{try{const c=JSON.parse(localStorage.getItem("canal-config-v1")||"{}");return c.logoUrl||LOGO_SM;}catch(e){return LOGO_SM;}})()}  alt="Lock & Dock Delivery"/>
         <span className="nav-logo-text">Lock <span>&</span> Dock</span>
       </div>
       <div className="nav-tabs">

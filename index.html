@@ -3,8 +3,17 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Lock &amp; Dock Delivery</title>
-  <meta name="description" content="Packs apéro et petit-déjeuner livrés à quai – Canal du Midi"/>
+  <title>Lock &amp; Dock Delivery — Livraison à bord sur le Canal du Midi</title>
+  <meta name="description" content="Faites livrer vos provisions directement sur votre bateau. Produits locaux et régionaux, livraison dans l'heure sur le Canal du Midi entre Le Somail et Béziers."/>
+  <meta name="keywords" content="livraison bateau Canal du Midi, provisions bord, épicerie bateau, Le Somail, Béziers, Capestang, Occitanie"/>
+  <meta property="og:title" content="Lock &amp; Dock Delivery — Livraison à bord"/>
+  <meta property="og:description" content="Provisions livrées sur votre bateau en moins d'une heure. Canal du Midi, Le Somail → Béziers."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://lock-dock-delivery.vercel.app"/>
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:title" content="Lock &amp; Dock Delivery"/>
+  <meta name="twitter:description" content="Provisions livrées sur votre bateau en moins d'une heure. Canal du Midi."/>
+  <link rel="canonical" href="https://lock-dock-delivery.vercel.app"/>
   <meta name="theme-color" content="#2a2318"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -250,6 +259,40 @@
     .toast.red { background:var(--red); }
     .toast.default { background:var(--dark); }
 
+    /* ── COMMENT ÇA MARCHE ── */
+    .how-section { background:var(--dark2); padding:56px 24px; border-top:1px solid rgba(255,255,255,.08); }
+    .how-title { font-family:var(--fd); font-size:clamp(1.8rem,3.5vw,2.6rem); font-weight:400; text-align:center; color:var(--cream); margin-bottom:8px; }
+    .how-subtitle { text-align:center; font-size:.8rem; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin-bottom:40px; opacity:.7; }
+    .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:900px; margin:0 auto; }
+    .how-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); border-radius:var(--r); padding:32px 24px; text-align:center; position:relative; }
+    .how-card::before { content:attr(data-step); position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:var(--gold); color:var(--dark); font-size:.65rem; font-weight:700; letter-spacing:.1em; padding:3px 10px; border-radius:50px; }
+    .how-ico { font-size:2.4rem; margin-bottom:16px; display:block; }
+    .how-card-title { font-family:var(--fd); font-size:1.2rem; font-weight:500; color:var(--cream); margin-bottom:10px; }
+    .how-card-desc { font-size:.82rem; color:rgba(255,255,255,.5); line-height:1.6; }
+
+    /* ── FAQ ── */
+    .faq-section { background:var(--dark); padding:56px 24px; border-top:1px solid rgba(255,255,255,.08); }
+    .faq-title { font-family:var(--fd); font-size:clamp(1.8rem,3.5vw,2.6rem); font-weight:400; text-align:center; color:var(--cream); margin-bottom:40px; }
+    .faq-list { max-width:720px; margin:0 auto; }
+    .faq-item { border-bottom:1px solid rgba(255,255,255,.08); }
+    .faq-q { width:100%; background:none; border:none; color:var(--cream); font-family:var(--fs); font-size:.92rem; font-weight:500; text-align:left; padding:18px 0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:16px; transition:color .2s; }
+    .faq-q:hover { color:var(--gold); }
+    .faq-q .faq-arrow { font-size:.8rem; color:var(--gold); transition:transform .25s; flex-shrink:0; }
+    .faq-q.open .faq-arrow { transform:rotate(180deg); }
+    .faq-a { overflow:hidden; max-height:0; transition:max-height .3s ease, padding .3s ease; }
+    .faq-a.open { max-height:200px; }
+    .faq-a-inner { padding:0 0 18px; font-size:.85rem; color:rgba(255,255,255,.55); line-height:1.7; border-left:3px solid var(--gold); padding-left:16px; margin-left:2px; }
+
+    /* ── MENTIONS LÉGALES MODAL ── */
+    .mentions-modal { background:var(--dark2); border:1px solid rgba(255,255,255,.14); border-radius:var(--r); padding:32px; width:100%; max-width:520px; box-shadow:var(--sh2); color:var(--cream); }
+    .mentions-modal h2 { font-family:var(--fd); font-size:1.5rem; font-weight:500; margin-bottom:20px; color:var(--gold); }
+    .mentions-modal p { font-size:.85rem; color:rgba(255,255,255,.65); line-height:1.75; margin-bottom:10px; }
+    .mentions-modal a { color:var(--canal2); text-decoration:none; }
+    .mentions-close { margin-top:20px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:var(--cream); padding:9px 22px; border-radius:var(--r); font-family:var(--fs); font-size:.84rem; cursor:pointer; transition:background .2s; }
+    .mentions-close:hover { background:rgba(255,255,255,.18); }
+    .footer-legal-link { font-size:.72rem; color:rgba(255,255,255,.3); text-decoration:none; cursor:pointer; background:none; border:none; font-family:var(--fs); transition:color .2s; margin-top:10px; display:inline-block; }
+    .footer-legal-link:hover { color:var(--gold); }
+
     @media(max-width:640px){
       .form-row { grid-template-columns:1fr; }
       .mv-grid { grid-template-columns:1fr 1fr; }
@@ -265,6 +308,7 @@
       thead th:nth-child(4),td:nth-child(4),thead th:nth-child(5),td:nth-child(5) { display:none; }
       .cfg-grid2 { grid-template-columns:1fr; }
       .product-item:hover { margin:0; padding:24px 0; background:none; }
+      .how-grid { grid-template-columns:1fr; gap:32px; }
     }
   </style>
 </head>
@@ -325,6 +369,17 @@ const LANGS = {
     add: "+ Ajouter",
     selected: "✓ Sélectionné",
     total: "Total",
+    howTitle: "Comment ça marche ?",
+    howStep1Title: "Choisissez vos produits",
+    howStep1Desc: "Parcourez notre sélection de produits locaux et ajoutez-les à votre panier",
+    howStep2Title: "Indiquez votre écluse",
+    howStep2Desc: "Précisez votre position sur le canal (écluse ou port de plaisance)",
+    howStep3Title: "Recevez à bord",
+    howStep3Desc: "Livraison directement sur votre bateau en moins d'une heure",
+    heroCTASub: "Réponse en moins de 10 min · Livraison en 1h",
+    faqTitle: "Questions fréquentes",
+    mentionsTitle: "Mentions légales",
+    mentionsLink: "Mentions légales",
   },
   en: {
     catalogue: "🛒 Catalogue",
@@ -363,6 +418,17 @@ const LANGS = {
     add: "+ Add",
     selected: "✓ Selected",
     total: "Total",
+    howTitle: "How does it work?",
+    howStep1Title: "Choose your products",
+    howStep1Desc: "Browse our selection of local products and add them to your basket",
+    howStep2Title: "Give your lock location",
+    howStep2Desc: "Specify your position on the canal (lock or marina)",
+    howStep3Title: "Receive on board",
+    howStep3Desc: "Delivery directly to your boat in under one hour",
+    heroCTASub: "Reply in under 10 min · Delivery in 1h",
+    faqTitle: "Frequently asked questions",
+    mentionsTitle: "Legal notice",
+    mentionsLink: "Legal notice",
   },
   es: {
     catalogue: "🛒 Catálogo",
@@ -401,6 +467,17 @@ const LANGS = {
     add: "+ Añadir",
     selected: "✓ Seleccionado",
     total: "Total",
+    howTitle: "¿Cómo funciona?",
+    howStep1Title: "Elija sus productos",
+    howStep1Desc: "Explore nuestra selección de productos locales y añádalos a su cesta",
+    howStep2Title: "Indique su esclusa",
+    howStep2Desc: "Especifique su posición en el canal (esclusa o puerto deportivo)",
+    howStep3Title: "Recíbalos a bordo",
+    howStep3Desc: "Entrega directamente en su barco en menos de una hora",
+    heroCTASub: "Respuesta en menos de 10 min · Entrega en 1h",
+    faqTitle: "Preguntas frecuentes",
+    mentionsTitle: "Aviso legal",
+    mentionsLink: "Aviso legal",
   }
 };
 // ─── SUPABASE ──────────────────────────────────────────────
@@ -598,6 +675,79 @@ const SBadge = ({status}) => {
 };
 
 // ═══════════════════════════════════════════════════════
+//  FAQ
+// ═══════════════════════════════════════════════════════
+const FAQ_DATA = [
+  {
+    q: "À quelle heure livrez-vous ?",
+    a: "Nous livrons de 8h à 20h, 7j/7, du 1er juin au 30 septembre. Commandez la veille ou le matin même."
+  },
+  {
+    q: "Que se passe-t-il si mon bateau change d'emplacement ?",
+    a: "Pas de problème ! Précisez simplement votre nouvelle position lors de la commande via WhatsApp. Nous nous adaptons."
+  },
+  {
+    q: "Y a-t-il un minimum de commande ?",
+    a: "Oui, le montant minimum est de 29€ pour bénéficier de la livraison."
+  },
+  {
+    q: "Comment se passe le paiement ?",
+    a: "Le paiement s'effectue à la livraison, en espèces ou par virement. Le paiement en ligne arrive bientôt !"
+  },
+  {
+    q: "Livrez-vous sur tout le Canal du Midi ?",
+    a: "Nous livrons entre Le Somail et Béziers. D'autres zones seront ajoutées prochainement."
+  },
+  {
+    q: "Les produits sont-ils vraiment locaux ?",
+    a: "Absolument ! Nous travaillons exclusivement avec des producteurs et artisans de la région Occitanie."
+  },
+];
+
+function FAQSection({t}) {
+  const [openIdx, setOpenIdx] = useState(null);
+  return (
+    <div className="faq-section">
+      <div className="faq-title">{t.faqTitle||"Questions fréquentes"}</div>
+      <div className="faq-list">
+        {FAQ_DATA.map((item, i) => (
+          <div className="faq-item" key={i}>
+            <button
+              className={"faq-q"+(openIdx===i?" open":"")}
+              onClick={()=>setOpenIdx(openIdx===i?null:i)}
+            >
+              <span>{item.q}</span>
+              <span className="faq-arrow">▼</span>
+            </button>
+            <div className={"faq-a"+(openIdx===i?" open":"")}>
+              <div className="faq-a-inner">{item.a}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  MENTIONS LÉGALES MODAL
+// ═══════════════════════════════════════════════════════
+function MentionsModal({onClose, t}) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="mentions-modal" onClick={e=>e.stopPropagation()}>
+        <h2>{t.mentionsTitle||"Mentions légales"}</h2>
+        <p><strong>Lock &amp; Dock Delivery</strong></p>
+        <p>Site en cours de déploiement. La société sera immatriculée avant le lancement en juin 2026.</p>
+        <p>Contact : <a href="mailto:lockdockdelivery@gmail.com">lockdockdelivery@gmail.com</a></p>
+        <p>Hébergeur : Vercel Inc., 340 Pine Street Suite 701, San Francisco, CA 94104, États-Unis</p>
+        <button className="mentions-close" onClick={onClose}>Fermer</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
 //  CATALOGUE
 // ═══════════════════════════════════════════════════════
 function Catalogue({appCfg, lang, t}) {
@@ -607,6 +757,7 @@ function Catalogue({appCfg, lang, t}) {
   const [packQty,setPackQty]=useState({});
   const [extraQty,setExtraQty]=useState({});
   const [form,setForm]=useState({name:"",phone:"",halte:"",creneau:"",notes:""});
+  const [showMentions,setShowMentions]=useState(false);
 
   const {packs:MPACKS, haltes:MHALTES, creneaux:MCRENEAUX, minCmd, wa:WA_NUM, cfg:cfgBase} = getMergedData();
   const cfg = appCfg || cfgBase;
@@ -678,10 +829,36 @@ function Catalogue({appCfg, lang, t}) {
       <h1>{cfg.heroTitle||"Vos saveurs"}<br/><em>{cfg.heroTitleEm||"livrées à bord"}</em></h1>
       <p>{cfg.heroSub||"Apéros, petits-déjeuners et essentiels livrés directement sur votre ponton, entre Le Somail et Béziers."}</p>
       <div className="hero-btns">
-        <a className="hero-cta" href={MWA} target="_blank" rel="noreferrer"><WaIco/> {t.orderWA}</a>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
+          <a className="hero-cta" href={MWA} target="_blank" rel="noreferrer"><WaIco/> {t.orderWA}</a>
+          <span style={{fontSize:"0.75rem",color:"rgba(255,255,255,0.6)"}}>{t.heroCTASub}</span>
+        </div>
         <a className="hero-sms" href={"sms:+"+WA_NUM}>💬 {t.orderSMS}</a>
       </div>
       <div className="hero-wave"/>
+    </div>
+
+    {/* ── COMMENT ÇA MARCHE ── */}
+    <div className="how-section">
+      <div className="how-title">{t.howTitle}</div>
+      <div className="how-subtitle">3 étapes simples</div>
+      <div className="how-grid">
+        <div className="how-card" data-step="01">
+          <span className="how-ico">🛒</span>
+          <div className="how-card-title">{t.howStep1Title}</div>
+          <div className="how-card-desc">{t.howStep1Desc}</div>
+        </div>
+        <div className="how-card" data-step="02">
+          <span className="how-ico">📍</span>
+          <div className="how-card-title">{t.howStep2Title}</div>
+          <div className="how-card-desc">{t.howStep2Desc}</div>
+        </div>
+        <div className="how-card" data-step="03">
+          <span className="how-ico">🚤</span>
+          <div className="how-card-title">{t.howStep3Title}</div>
+          <div className="how-card-desc">{t.howStep3Desc}</div>
+        </div>
+      </div>
     </div>
 
     {/* ── ONGLETS CATÉGORIES ── */}
@@ -805,6 +982,9 @@ function Catalogue({appCfg, lang, t}) {
       </div>
     )}
 
+    {/* ── FAQ ── */}
+    <FAQSection t={t}/>
+
     {/* ── FOOTER ── */}
     <footer className="site-footer">
       <div className="footer-brand">Lock &amp; Dock</div>
@@ -813,7 +993,15 @@ function Catalogue({appCfg, lang, t}) {
       <div className="footer-info">
         {cfg.footerText||"Livraison dans l'heure · Canal du Midi · Le Somail → Béziers"}
       </div>
+      <div style={{marginTop:16}}>
+        <button className="footer-legal-link" onClick={()=>setShowMentions(true)}>
+          {t.mentionsLink||"Mentions légales"}
+        </button>
+      </div>
     </footer>
+
+    {/* ── MENTIONS LÉGALES ── */}
+    {showMentions&&<MentionsModal t={t} onClose={()=>setShowMentions(false)}/>}
   </>);
 }
 

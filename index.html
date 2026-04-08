@@ -768,7 +768,7 @@ function MentionsModal({onClose, t}) {
 // ═══════════════════════════════════════════════════════
 //  CATALOGUE
 // ═══════════════════════════════════════════════════════
-function Catalogue({appCfg, lang, t}) {
+function Catalogue({appCfg, lang, t, isAdmin, setPending, setShowLogin}) {
   t = t || LANGS.fr;
   const [cat,setCat]=useState("all");
   // qty: {packId: number}
@@ -2266,7 +2266,7 @@ function App() {
       )}
     </nav>
 
-    {view==="catalogue"  && <Catalogue appCfg={appCfg} lang={lang} t={t}/>}
+    {view==="catalogue"  && <Catalogue appCfg={appCfg} lang={lang} t={t} isAdmin={isAdmin} setPending={setPending} setShowLogin={setShowLogin}/>}
     {view==="backoffice" && isAdmin && <Backoffice stockState={stockState} setStockState={setStockState}/>}
     {view==="stock"      && isAdmin && <Stock      stockState={stockState} setStockState={setStockState}/>}
     {view==="config"     && isAdmin && <Config onSave={setAppCfg}/>}

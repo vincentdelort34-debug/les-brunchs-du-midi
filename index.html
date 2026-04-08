@@ -2115,21 +2115,35 @@ function App() {
           🛒 Catalogue
         </button>
         {isAdmin&&(
-          <button className={`nav-tab${view==="backoffice"?" active":""}`} onClick={()=>setView("backoffice")}>
-            ⚙️ Back-office
-          </button>
+          <div className="nav-tabs-admin">
+            <button className={`nav-tab${view==="backoffice"?" active":""}`} onClick={()=>setView("backoffice")}>
+              ⚙️ Back-office
+            </button>
+            <button className={`nav-tab${view==="config"?" active":""}`} onClick={()=>setView("config")}>
+              ⚙️ Config
+            </button>
+            <button className="nav-tab" onClick={logout} style={{color:"var(--terra)",fontSize:".72rem"}}>
+              Quitter ↩
+            </button>
+          </div>
         )}
         {isAdmin&&(
-          <button className={`nav-tab${view==="config"?" active":""}`} onClick={()=>setView("config")}>
-            ⚙️ Config
-          </button>
-        )}
-        {isAdmin&&(
-          <button className="nav-tab" onClick={logout} style={{color:"var(--terra)",fontSize:".72rem"}}>
-            Quitter ↩
-          </button>
+          <button className="nav-menu-btn" onClick={()=>setMenuOpen(!menuOpen)}>☰</button>
         )}
       </div>
+      {isAdmin&&(
+        <div className={`nav-drawer${menuOpen?" open":""}`}>
+          <button className={`nav-tab${view==="backoffice"?" active":""}`} onClick={()=>{setView("backoffice");setMenuOpen(false);}}>
+            ⚙️ Back-office
+          </button>
+          <button className={`nav-tab${view==="config"?" active":""}`} onClick={()=>{setView("config");setMenuOpen(false);}}>
+            ⚙️ Config
+          </button>
+          <button className="nav-tab" onClick={()=>{logout();setMenuOpen(false);}} style={{color:"var(--terra)",fontSize:".72rem"}}>
+            Quitter ↩
+          </button>
+        </div>
+      )}
     </nav>
 
     {view==="catalogue"  && <Catalogue appCfg={appCfg} lang={lang} t={t}/>}

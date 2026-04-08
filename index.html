@@ -311,6 +311,24 @@
       .how-grid { grid-template-columns:1fr; gap:32px; }
     }
   </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+    .map-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .map-modal{background:var(--white);border-radius:16px;width:100%;max-width:600px;max-height:90vh;overflow:hidden;box-shadow:var(--sh2);}
+    .map-modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--sand);}
+    .map-modal-header h3{margin:0;font-family:var(--fd);font-size:1.1rem;color:var(--dark);}
+    .map-modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);}
+    .map-container{width:100%;height:350px;}
+    .map-modal-footer{padding:16px 20px;border-top:1px solid var(--sand);}
+    .map-coords{font-size:.8rem;color:var(--muted);margin-bottom:8px;}
+    .map-confirm-btn{width:100%;padding:12px;border:none;border-radius:10px;background:var(--canal);color:white;font-weight:600;font-family:var(--fs);font-size:.9rem;cursor:pointer;}
+    .map-confirm-btn:disabled{opacity:.4;cursor:not-allowed;}
+    .delivery-loc-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:1.5px dashed var(--canal);background:rgba(93,130,109,.08);color:var(--canal);font-weight:600;font-family:var(--fs);font-size:.85rem;cursor:pointer;width:100%;justify-content:center;transition:all .2s;}
+    .delivery-loc-btn:hover{background:rgba(93,130,109,.15);}
+    .delivery-loc-btn.has-pin{border-style:solid;background:rgba(93,130,109,.12);}
+  </style>
 </head>
 <body>
 <div id="root"></div>
@@ -756,8 +774,9 @@ function Catalogue({appCfg, lang, t}) {
   // qty: {packId: number}
   const [packQty,setPackQty]=useState({});
   const [extraQty,setExtraQty]=useState({});
-  const [form,setForm]=useState({name:"",phone:"",halte:"",creneau:"",notes:""});
+  const [form,setForm]=useState({name:"",phone:"",halte:"",creneau:"",notes:"",deliveryLat:null,deliveryLng:null});
   const [showMentions,setShowMentions]=useState(false);
+  const [showMap,setShowMap]=useState(false);
 
   const {packs:MPACKS, haltes:MHALTES, creneaux:MCRENEAUX, minCmd, wa:WA_NUM, cfg:cfgBase} = getMergedData();
   const cfg = appCfg || cfgBase;
@@ -795,6 +814,7 @@ function Catalogue({appCfg, lang, t}) {
       `📦 *Packs :*`,...selPacks.map(p=>`  • ${getPQty(p.id)}× ${p.label} — ${p.price*getPQty(p.id)} €`),
       ...(selExtras.length?[``,`➕ *Extras :*`,...selExtras.map(e=>`  • ${getEQty(e.id)}× ${e.label} — ${e.price*getEQty(e.id)} €`)]:[]),
       ``,`💰 *Total : ${total} €*`,...(form.notes?[``,`📝 ${form.notes}`]:[]),
+      ...(form.deliveryLat?[``,`📍 *Position GPS :* ${form.deliveryLat.toFixed(5)}, ${form.deliveryLng.toFixed(5)}`,`🗺️ https://www.google.com/maps?q=${form.deliveryLat},${form.deliveryLng}`]:[]),
     ].join("\n");
     
     // Ouvrir WhatsApp IMMÉDIATEMENT (doit être dans le même clic)
@@ -804,7 +824,7 @@ function Catalogue({appCfg, lang, t}) {
     if (GOOGLE_SCRIPT_URL) {
       const payload = {
         id, client:form.name, phone:form.phone, halte:form.halte,
-        creneau:form.creneau, notes:form.notes,
+        creneau:form.creneau, notes:form.notes, gpsLat:form.deliveryLat, gpsLng:form.deliveryLng,
         packs:selPacks.map(p=>({label:`${getPQty(p.id)}× ${p.label}`,price:p.price*getPQty(p.id),id:p.id})),
         extras:selExtras.map(e=>({label:`${getEQty(e.id)}× ${e.label}`,price:e.price*getEQty(e.id)})),
         total,
@@ -973,6 +993,12 @@ function Catalogue({appCfg, lang, t}) {
             <div className="form-grp"><label className="form-lbl">{t.creneau}</label><select className="form-ctrl" value={form.creneau} onChange={e=>setForm({...form,creneau:e.target.value})}><option value="">{t.chooseCreneau}</option>{MCRENEAUX.map(c=><option key={c}>{c}</option>)}</select></div>
           </div>
           <div className="form-grp"><label className="form-lbl">{t.notes}</label><textarea className="form-ctrl" placeholder={t.notesph} value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})}/></div>
+          <div className="form-grp" style={{marginTop:8}}>
+            <button type="button" className={"delivery-loc-btn"+(form.deliveryLat?" has-pin":"")} onClick={()=>setShowMap(true)}>
+              {form.deliveryLat ? "📍 Position marquée — modifier" : "📍 Où vous livrer sur le canal ?"}
+            </button>
+            {form.deliveryLat&&<p style={{fontSize:".75rem",color:"var(--muted)",marginTop:4,textAlign:"center"}}>GPS : {form.deliveryLat.toFixed(5)}, {form.deliveryLng.toFixed(5)}</p>}
+          </div>
           {canOrder
             ? <button className="btn-wa" onClick={sendOrder}><WaIco size={20}/> {t.sendOrder} — {total} €</button>
             : <button className="btn-wa" disabled><WaIco size={20}/> {t.sendOrder} — {total} €</button>}
@@ -1007,6 +1033,16 @@ function Catalogue({appCfg, lang, t}) {
 
     {/* ── MENTIONS LÉGALES ── */}
     {showMentions&&<MentionsModal t={t} onClose={()=>setShowMentions(false)}/>}
+
+  {/* ── CARTE LIVRAISON ── */}
+  {showMap&&(
+    <DeliveryMapModal
+      onConfirm={(lat,lng)=>{setForm({...form,deliveryLat:lat,deliveryLng:lng});setShowMap(false);}}
+      onClose={()=>setShowMap(false)}
+      initialLat={form.deliveryLat}
+      initialLng={form.deliveryLng}
+    />
+  )}
   </>);
 }
 
@@ -1014,6 +1050,85 @@ function Catalogue({appCfg, lang, t}) {
 // ═══════════════════════════════════════════════════════
 //  BACK-OFFICE
 // ═══════════════════════════════════════════════════════
+
+
+// ─── DELIVERY MAP MODAL ───────────────────────────────────
+function DeliveryMapModal({onConfirm, onClose, initialLat, initialLng}) {
+  const mapRef = React.useRef(null);
+  const markerRef = React.useRef(null);
+  const [pin, setPin] = React.useState(initialLat ? {lat:initialLat,lng:initialLng} : null);
+
+  const HALTE_COORDS = [
+    {name:"Le Somail",lat:43.3294,lng:2.9707},
+    {name:"Argeliers",lat:43.3137,lng:2.9285},
+    {name:"Ventenac-en-Minervois",lat:43.2543,lng:2.8610},
+    {name:"Paraza",lat:43.2597,lng:2.8330},
+    {name:"Roubia",lat:43.2497,lng:2.7877},
+    {name:"Argens-Minervois",lat:43.2429,lng:2.7562},
+    {name:"Homps",lat:43.2701,lng:2.7228},
+    {name:"Capestang",lat:43.3282,lng:3.0421},
+    {name:"Poilhes",lat:43.3489,lng:3.0895},
+    {name:"Colombiers",lat:43.3165,lng:3.1388},
+    {name:"Béziers (port)",lat:43.3393,lng:3.2154}
+  ];
+
+  React.useEffect(()=>{
+    if(!mapRef.current) {
+      const map = L.map("delivery-map").setView([43.30, 2.95], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+        attribution:"© OpenStreetMap"
+      }).addTo(map);
+
+      // Add halte markers
+      HALTE_COORDS.forEach(h=>{
+        L.marker([h.lat,h.lng],{
+          icon:L.divIcon({className:"",html:'<div style="background:var(--canal,#5d826d);color:white;padding:2px 6px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3);">'+h.name+'</div>',iconSize:[0,0],iconAnchor:[-5,10]})
+        }).addTo(map);
+      });
+
+      // If existing pin, show it
+      if(initialLat) {
+        markerRef.current = L.marker([initialLat, initialLng],{
+          icon:L.divIcon({className:"",html:'<div style="font-size:28px;">📍</div>',iconSize:[28,28],iconAnchor:[14,28]})
+        }).addTo(map);
+        map.setView([initialLat, initialLng], 14);
+      }
+
+      map.on("click", function(e) {
+        if(markerRef.current) map.removeLayer(markerRef.current);
+        markerRef.current = L.marker([e.latlng.lat, e.latlng.lng],{
+          icon:L.divIcon({className:"",html:'<div style="font-size:28px;">📍</div>',iconSize:[28,28],iconAnchor:[14,28]})
+        }).addTo(map);
+        setPin({lat:e.latlng.lat, lng:e.latlng.lng});
+      });
+
+      mapRef.current = map;
+    }
+    return ()=>{ if(mapRef.current){ mapRef.current.remove(); mapRef.current=null; } };
+  },[]);
+
+  return (
+    <div className="map-modal-overlay" onClick={e=>{if(e.target.classList.contains("map-modal-overlay"))onClose();}}>
+      <div className="map-modal">
+        <div className="map-modal-header">
+          <h3>📍 Où vous livrer ?</h3>
+          <button className="map-modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div id="delivery-map" className="map-container"/>
+        <div className="map-modal-footer">
+          {pin
+            ? <p className="map-coords">✅ Position : {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)}</p>
+            : <p className="map-coords">Touchez la carte pour indiquer votre position sur le canal</p>}
+          <button className="map-confirm-btn" disabled={!pin} onClick={()=>pin&&onConfirm(pin.lat,pin.lng)}>
+            {pin ? "Confirmer cette position" : "Placez votre position sur la carte"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function Backoffice({stockState,setStockState}) {
   const [orders,setOrders]=useState(()=>lsGet(SK_ORDERS,MOCK_ORDERS));
   const [fstat,setFstat]=useState("all");

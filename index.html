@@ -137,7 +137,7 @@
       background: var(--gold); opacity: .5;
     }
     .hero h1 {
-      font-family: var(--fd); font-size: clamp(2.6rem, 6vw, 4.8rem);
+      font-family: var(--fd); font-size: clamp(2.86rem, 6.6vw, 5.28rem);
       font-weight: 400; line-height: 1.05; letter-spacing: -.01em;
       margin-bottom: 18px; position: relative;
     }
@@ -213,7 +213,7 @@
     .cat-nav::-webkit-scrollbar { display: none; }
     .cat-nav-inner { display: flex; padding: 0 24px; min-width: max-content; }
     .cat-tab {
-      padding: 18px 22px; font-size: .78rem; font-weight: 500;
+      padding: 18px 22px; font-size: .9rem; font-weight: 500;
       letter-spacing: .08em; text-transform: uppercase;
       color: rgba(255,255,255,.4); cursor: pointer;
       border: none; background: none; border-bottom: 2px solid transparent;
@@ -227,7 +227,17 @@
     .cat-count { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-top: 4px; }
 
     /* ── PRODUCT LIST ── */
-    .products-list { padding: 8px 24px 60px; max-width: 1100px; margin: 0 auto; }
+    .products-list {
+      padding: 8px 24px 24px; max-width: 1100px; margin: 0 auto 40px;
+      max-height: 70vh; overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #b8965a rgba(255,255,255,.05);
+      -webkit-overflow-scrolling: touch;
+    }
+    .products-list::-webkit-scrollbar { width: 8px; }
+    .products-list::-webkit-scrollbar-track { background: rgba(255,255,255,.05); border-radius: 4px; }
+    .products-list::-webkit-scrollbar-thumb { background: #b8965a; border-radius: 4px; }
+    .products-list::-webkit-scrollbar-thumb:hover { background: #d4aa6e; }
     .product-item {
       display: flex; align-items: flex-start; gap: 18px;
       padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,.07);
@@ -244,10 +254,10 @@
     }
     .product-img img { width: 100%; height: 100%; object-fit: cover; }
     .product-info { flex: 1; min-width: 0; }
-    .product-name { font-family: var(--fd); font-size: 1.3rem; font-weight: 500; line-height: 1.2; margin-bottom: 4px; color: var(--cream); }
-    .product-desc { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.55; margin-bottom: 12px; }
+    .product-name { font-family: var(--fd); font-size: 1.4rem; font-weight: 500; line-height: 1.2; margin-bottom: 4px; color: var(--cream); }
+    .product-desc { font-size: .9rem; color: rgba(255,255,255,.55); line-height: 1.55; margin-bottom: 12px; }
     .product-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-    .product-price { font-family: var(--fd); font-size: 1.5rem; font-weight: 600; color: var(--gold); letter-spacing: -.01em; }
+    .product-price { font-family: var(--fd); font-size: 1.7rem; font-weight: 600; color: var(--gold); letter-spacing: -.01em; }
     .product-price span { font-size: .72rem; font-weight: 400; color: rgba(255,255,255,.4); margin-left: 4px; font-family: var(--fs); }
     .product-unav { font-size: .72rem; color: var(--red); letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
     .btn-add {
@@ -348,7 +358,7 @@
     .notice.info { background: rgba(255,255,255,.05); color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.1); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .form-grp { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-    .form-lbl { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+    .form-lbl { font-size: .82rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.55); }
     .form-ctrl {
       padding: 12px 14px; border: 1.5px solid rgba(255,255,255,.12);
       border-radius: 6px; font-family: var(--fs); font-size: .9rem;
@@ -357,6 +367,30 @@
     }
     .form-ctrl:focus { border-color: var(--gold); }
     .form-ctrl option { background: var(--dark2); color: var(--cream); }
+    /* Date picker */
+    .date-picker {
+      color-scheme: dark;
+      background: #1c1a17;
+      color: var(--cream);
+      font-family: var(--fs);
+      font-size: 1rem;
+      padding: 14px 16px;
+      border: 1.5px solid rgba(184,150,90,.35);
+      cursor: pointer;
+    }
+    .date-picker:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,150,90,.15); }
+    .date-picker::-webkit-calendar-picker-indicator {
+      filter: invert(70%) sepia(40%) saturate(500%) hue-rotate(10deg);
+      cursor: pointer; font-size: 1.1rem;
+    }
+    .date-fr-display {
+      margin-top: 6px; padding: 10px 14px;
+      background: rgba(184,150,90,.12); border: 1px solid rgba(184,150,90,.35);
+      border-radius: 6px; color: var(--gold);
+      font-family: var(--fd); font-size: 1.1rem; font-weight: 500;
+      text-transform: capitalize;
+    }
+    .date-hint { font-size: .78rem; color: rgba(255,255,255,.4); margin-top: 6px; }
 
     .order-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
     .btn-pay {
@@ -750,6 +784,23 @@ const fmtEUR = n => (Number(n) || 0).toFixed(2).replace(".", ",") + " €";
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const uid = () => "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
 
+// Date helpers (livraison : demain à +14j)
+const addDaysISO = (n) => {
+  const d = new Date(); d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const tomorrowISO = () => addDaysISO(1);
+const maxDeliveryISO = () => addDaysISO(14);
+const FR_DAYS   = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+const FR_MONTHS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const formatDateFr = (iso) => {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return "";
+  const dt = new Date(y, m - 1, d);
+  return FR_DAYS[dt.getDay()] + " " + d + " " + FR_MONTHS[m - 1] + " " + y;
+};
+
 function buildOrderMsg(items, form, total) {
   let lines = [];
   lines.push("🚢 NOUVELLE COMMANDE — Lock and Dock Delivery");
@@ -766,7 +817,7 @@ function buildOrderMsg(items, form, total) {
   lines.push("");
   lines.push("📍 Halte : " + (form.halte || "—"));
   lines.push("⏰ Créneau : " + (form.creneau || "—"));
-  lines.push("📅 Date : " + (form.date || todayISO()));
+  lines.push("📅 Date de livraison : " + (form.date ? formatDateFr(form.date) : "—"));
   if (form.boat)  lines.push("⛵ Bateau : " + form.boat);
   if (form.notes) lines.push("📝 Notes : " + form.notes);
   return lines.join("\n");
@@ -835,7 +886,7 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
   const [zoomProd, setZoomProd] = useState(null);
   const [form, setForm] = useState({
     name: "", phone: "", boat: "",
-    halte: "", creneau: "", date: todayISO(), notes: ""
+    halte: "", creneau: "", date: tomorrowISO(), notes: ""
   });
   const [showMentions, setShowMentions] = useState(false);
 
@@ -884,7 +935,7 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
     setCart(c => { const n = { ...c }; delete n[id]; return n; });
   };
 
-  const canSubmit = () => cartItems.length > 0 && total >= minCmd && form.name && form.halte && form.creneau;
+  const canSubmit = () => cartItems.length > 0 && total >= minCmd && form.name && form.halte && form.creneau && form.date && form.date >= tomorrowISO() && form.date <= maxDeliveryISO();
 
   const sendWA = () => {
     if (!canSubmit()) return;
@@ -892,7 +943,7 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
     const num = (siteCfg.contact.whatsapp || "").replace(/[^0-9]/g, "");
     const url = "https://wa.me/" + num + "?text=" + encodeURIComponent(msg);
     onCmdSubmit({ items: cartItems, form, total, channel: "whatsapp" });
-    setCart({}); setForm({ name:"", phone:"", boat:"", halte:"", creneau:"", date: todayISO(), notes:"" });
+    setCart({}); setForm({ name:"", phone:"", boat:"", halte:"", creneau:"", date: tomorrowISO(), notes:"" });
     window.open(url, "_blank");
     showToast("Commande envoyée ✓", "green");
   };
@@ -905,7 +956,7 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
     const sep = isIos ? "&" : "?";
     const url = "sms:" + num + sep + "body=" + encodeURIComponent(msg);
     onCmdSubmit({ items: cartItems, form, total, channel: "sms" });
-    setCart({}); setForm({ name:"", phone:"", boat:"", halte:"", creneau:"", date: todayISO(), notes:"" });
+    setCart({}); setForm({ name:"", phone:"", boat:"", halte:"", creneau:"", date: tomorrowISO(), notes:"" });
     window.location.href = url;
     showToast("Commande envoyée par SMS ✓", "green");
   };
@@ -1094,15 +1145,30 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
               </select>
             </div>
           </div>
-          <div className="form-row">
-            <div className="form-grp">
-              <label className="form-lbl">Date</label>
-              <input className="form-ctrl" type="date" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-            </div>
-            <div className="form-grp">
-              <label className="form-lbl">Bateau (optionnel)</label>
-              <input className="form-ctrl" value={form.boat} onChange={e => setForm({...form, boat: e.target.value})} placeholder="Nom du bateau" />
-            </div>
+          <div className="form-grp">
+            <label className="form-lbl">📅 Date de livraison *</label>
+            <input
+              className="form-ctrl date-picker"
+              type="date"
+              value={form.date}
+              min={tomorrowISO()}
+              max={maxDeliveryISO()}
+              onChange={e => {
+                const v = e.target.value;
+                if (v && (v < tomorrowISO() || v > maxDeliveryISO())) return;
+                setForm({...form, date: v});
+              }}
+            />
+            {form.date && (
+              <div className="date-fr-display">
+                ✓ {formatDateFr(form.date)}
+              </div>
+            )}
+            <div className="date-hint">Livraison possible de demain jusqu'à {formatDateFr(maxDeliveryISO())}.</div>
+          </div>
+          <div className="form-grp">
+            <label className="form-lbl">⛵ Bateau (optionnel)</label>
+            <input className="form-ctrl" value={form.boat} onChange={e => setForm({...form, boat: e.target.value})} placeholder="Nom du bateau" />
           </div>
           <div className="form-grp">
             <label className="form-lbl">Notes / précisions</label>

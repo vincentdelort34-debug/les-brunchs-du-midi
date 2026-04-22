@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lock-dock-delivery.vercel.app/sitemap.xml

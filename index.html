@@ -3,22 +3,80 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Lock and Dock Delivery — Livraison à bord sur le Canal du Midi</title>
-  <meta name="description" content="Faites livrer vos provisions directement sur votre bateau. Produits locaux, livraison sur le Canal du Midi entre Le Somail et Béziers."/>
-  <meta name="keywords" content="livraison bateau Canal du Midi, provisions bord, épicerie bateau, Le Somail, Béziers, Capestang, Occitanie"/>
-  <meta property="og:title" content="Lock and Dock Delivery — Livraison à bord"/>
-  <meta property="og:description" content="Provisions livrées sur votre bateau en moins d'une heure. Canal du Midi, Le Somail → Béziers."/>
+
+  <!-- SEO core -->
+  <title>Lock and Dock Delivery — Livraison à bord sur le Canal du Midi | Le Somail → Béziers</title>
+  <meta name="description" content="Livraison de paniers apéritifs, petit-déjeuner, vins et provisions directement à bord de votre bateau ou péniche sur le Canal du Midi. Service rapide entre Le Somail et Béziers. Commandez via WhatsApp !"/>
+  <meta name="keywords" content="livraison canal du midi, livraison bateau, livraison péniche, apéro canal du midi, provisions bateau canal, livraison à quai, canal du midi béziers, le somail livraison, homps livraison, capestang livraison, argens minervois livraison, petit déjeuner bateau, panier apéritif canal, vins canal du midi, livraison bord eau hérault, lock and dock delivery"/>
+  <meta name="author" content="Lock and Dock Delivery"/>
+  <meta name="robots" content="index, follow, max-image-preview:large"/>
+  <meta name="googlebot" content="index, follow"/>
+  <link rel="canonical" href="https://lock-dock-delivery.vercel.app/"/>
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://lock-dock-delivery.vercel.app"/>
-  <meta name="twitter:card" content="summary"/>
-  <meta name="twitter:title" content="Lock and Dock Delivery"/>
-  <meta name="twitter:description" content="Provisions livrées sur votre bateau. Canal du Midi."/>
-  <link rel="canonical" href="https://lock-dock-delivery.vercel.app"/>
+  <meta property="og:title" content="Lock and Dock Delivery — Livraison à bord sur le Canal du Midi"/>
+  <meta property="og:description" content="Paniers apéritifs, petit-déjeuner, vins et provisions livrés directement sur votre bateau. Canal du Midi, Le Somail → Béziers."/>
+  <meta property="og:url" content="https://lock-dock-delivery.vercel.app/"/>
+  <meta property="og:image" content="https://lock-dock-delivery.vercel.app/og-image.jpg"/>
+  <meta property="og:locale" content="fr_FR"/>
+  <meta property="og:site_name" content="Lock and Dock Delivery"/>
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Lock and Dock Delivery — Livraison à bord Canal du Midi"/>
+  <meta name="twitter:description" content="Paniers apéritifs, vins et provisions livrés à votre bateau sur le Canal du Midi."/>
+
+  <!-- PWA / mobile -->
   <meta name="theme-color" content="#6B4226"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="Lock and Dock Delivery"/>
   <meta name="mobile-web-app-capable" content="yes"/>
+
+  <!-- Données structurées Schema.org — LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Lock and Dock Delivery",
+    "description": "Service de livraison de paniers apéritifs, petit-déjeuner, vins et provisions directement à bord des bateaux et péniches sur le Canal du Midi entre Le Somail et Béziers.",
+    "url": "https://lock-dock-delivery.vercel.app",
+    "email": "titdlrt@icloud.com",
+    "areaServed": {
+      "@type": "GeoCircle",
+      "geoMidpoint": {
+        "@type": "GeoCoordinates",
+        "latitude": "43.3117",
+        "longitude": "3.2214"
+      },
+      "geoRadius": "50000"
+    },
+    "serviceArea": {
+      "@type": "Place",
+      "name": "Canal du Midi — Le Somail à Béziers, Hérault, France"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Catalogue Lock and Dock Delivery",
+      "itemListElement": [
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Panier Apéritif livré à bord"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Petit-déjeuner livré sur le Canal du Midi"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Vins et champagnes livrés à quai"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Provisions et essentiels bord livrés"}}
+      ]
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": ["French", "English", "Spanish"]
+    },
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Preconnect (perf) -->
+  <link rel="preconnect" href="https://palsmxijbkxakdoracgi.supabase.co" crossorigin/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -849,7 +907,7 @@ function ProductModal({ product, qty, onAdd, onMinus, onClose }) {
         <div className="pmodal-wrap">
           <div className="pmodal-img">
             {product.photo
-              ? <img src={product.photo} alt={product.name}/>
+              ? <img src={product.photo} alt={product.name} loading="lazy"/>
               : <span>🍽️</span>}
           </div>
           <button className="pmodal-close" onClick={onClose} aria-label="Fermer">✕</button>
@@ -1065,7 +1123,7 @@ function SitePage({ siteCfg, catalogue, onCmdSubmit, showToast }) {
             return (
               <div key={p.id} className="product-item" onClick={() => setZoomProd(p)}>
                 <div className="product-img">
-                  {p.photo ? <img src={p.photo} alt={p.name}/> : <span>🍽️</span>}
+                  {p.photo ? <img src={p.photo} alt={p.name} loading="lazy"/> : <span>🍽️</span>}
                 </div>
                 <div className="product-info">
                   <div className="product-name">{p.name}</div>
@@ -1597,7 +1655,7 @@ function ProductRow({ product, tabs, onUpdate, onDelete, onToggleTab, showToast 
         {uploading
           ? <span style={{fontSize:".8rem"}}>…</span>
           : product.photo
-            ? <img src={product.photo} alt={product.name}/>
+            ? <img src={product.photo} alt={product.name} loading="lazy"/>
             : <span>📷</span>}
         <input ref={fileRef} type="file" accept="image/*" style={{display:"none"}} onChange={onFile} />
       </div>
